@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DucksInARow — Homebuyer Readiness Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #1a2744;
+  --blue: #2453a0;
+  --blue-light: #eef3ff;
+  --gold: #f0a500;
+  --gold-light: #fff8e6;
+  --off-white: #f5f7fb;
+  --gray: #8892a4;
+  --light-gray: #e8ecf4;
+  --green: #1a9e5c;
+  --green-light: #e6f7ef;
+  --red: #c0392b;
+  --red-light: #fdecea;
+  --amber: #d68000;
+  --amber-light: #fff3e0;
+  --reg-n: #7b2ff7;
+  --reg-n-light: #f3ecff;
+  --reg-z: #c0392b;
+  --reg-z-light: #fff0ee;
+  --reg-both: #d45d00;
+  --reg-both-light: #fff4ec;
+  --reg-safe: #1a9e5c;
+  --reg-safe-light: #e6f7ef;
+  --shadow: 0 4px 24px rgba(26,39,68,0.10);
+  --shadow-lg: 0 8px 40px rgba(26,39,68,0.18);
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--off-white); color: var(--navy); min-height: 100vh; }
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; flex-direction: column; }
+.screen.active { display: flex; }
+
+/* ── LOGIN ── */
+#screen-login {
+  background: linear-gradient(135deg, #0f1b35 0%, #1a2744 50%, #1e3a6e 100%);
+  align-items: center; justify-content: center; padding: 24px; position: relative; overflow: hidden;
+}
+#screen-login::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(36,83,160,0.3) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 20%, rgba(240,165,0,0.15) 0%, transparent 50%);
+}
+.login-card {
+  background: white; border-radius: 24px; padding: 48px 40px;
+  width: 100%; max-width: 440px; box-shadow: var(--shadow-lg);
+  text-align: center; position: relative; z-index: 1;
+}
+.login-ducks { display: flex; justify-content: center; gap: 6px; margin-bottom: 16px; }
+.login-duck { font-size: 28px; display: inline-block; animation: duckWobble 2s ease-in-out infinite; }
+.login-duck:nth-child(2){animation-delay:.2s} .login-duck:nth-child(3){animation-delay:.4s} .login-duck:nth-child(4){animation-delay:.6s}
+@keyframes duckWobble{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+.login-brand { font-family: 'Playfair Display', serif; font-size: 30px; color: var(--navy); margin-bottom: 4px; }
+.login-tagline { color: var(--gray); font-size: 14px; margin-bottom: 8px; }
+.login-domain { color: var(--blue); font-size: 13px; font-weight: 600; margin-bottom: 28px; }
+.login-divider { text-align: left; font-size: 11px; font-weight: 600; color: var(--gray); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; }
+.role-btn {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  padding: 16px 20px; border: 2px solid var(--light-gray); border-radius: 12px;
+  background: white; cursor: pointer; margin-bottom: 12px; text-align: left; transition: all .2s;
+}
+.role-btn:hover { border-color: var(--blue); background: var(--blue-light); transform: translateY(-1px); box-shadow: var(--shadow); }
+.role-icon { font-size: 30px; }
+.role-text strong { display: block; font-size: 15px; color: var(--navy); }
+.role-text span { font-size: 12px; color: var(--gray); }
+.login-note { font-size: 12px; color: var(--gray); margin-top: 16px; }
+
+/* ── TOPNAV ── */
+.topnav {
+  background: var(--navy); padding: 0 24px; height: 60px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  position: sticky; top: 0; z-index: 50;
+}
+.topnav-brand { display: flex; align-items: center; gap: 10px; color: white; font-family: 'Playfair Display', serif; font-size: 18px; }
+.topnav-right { display: flex; align-items: center; gap: 14px; }
+.nav-user { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,.85); font-size: 14px; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--gold); color: var(--navy); font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.avatar.client { background: var(--blue); color: white; }
+.logout-btn { background: rgba(255,255,255,.12); border: none; color: white; font-size: 12px; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-family: 'DM Sans'; transition: background .2s; }
+.logout-btn:hover { background: rgba(255,255,255,.22); }
+.hamburger { display: none; background: none; border: none; color: white; font-size: 22px; cursor: pointer; padding: 4px; }
+@media(max-width:768px) { .hamburger { display: block; } }
+
+/* ── LAYOUT ── */
+.main-layout { display: flex; flex: 1; overflow: hidden; height: calc(100vh - 60px); }
+.sidebar { width: 225px; background: white; border-right: 1px solid var(--light-gray); padding: 16px 0; flex-shrink: 0; overflow-y: auto; transition: transform .25s; }
+@media(max-width:768px) {
+  .sidebar { position: fixed; top: 60px; left: 0; bottom: 0; z-index: 40; transform: translateX(-100%); box-shadow: var(--shadow-lg); }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; top: 60px; background: rgba(0,0,0,.4); z-index: 39; }
+  .sidebar-overlay.open { display: block; }
+}
+.sidebar-section { padding: 10px 18px 4px; font-size: 10px; font-weight: 700; color: var(--gray); letter-spacing: .1em; text-transform: uppercase; }
+.sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 18px; cursor: pointer; font-size: 14px; color: var(--navy); border-left: 3px solid transparent; transition: all .15s; }
+.sidebar-item:hover { background: var(--off-white); }
+.sidebar-item.active { background: var(--blue-light); color: var(--blue); border-left-color: var(--blue); font-weight: 600; }
+.sidebar-item .s-icon { font-size: 15px; width: 20px; text-align: center; }
+.s-badge { margin-left: auto; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; }
+.s-badge.red { background: var(--red); color: white; }
+.s-badge.amber { background: var(--amber); color: white; }
+.s-badge.green { background: var(--green); color: white; }
+.content-area { flex: 1; overflow-y: auto; padding: 28px; }
+
+/* ── COMMON ── */
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--navy); }
+.page-header p { color: var(--gray); font-size: 14px; margin-top: 4px; }
+.card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+.card-header { padding: 18px 24px; border-bottom: 1px solid var(--light-gray); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.card-header h2 { font-size: 16px; font-weight: 600; color: var(--navy); }
+.card-body { padding: 20px 24px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: var(--radius-sm); font-family: 'DM Sans'; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .2s; text-decoration: none; }
+.btn-primary { background: var(--blue); color: white; }
+.btn-primary:hover { background: #1a3d7c; transform: translateY(-1px); }
+.btn-gold { background: var(--gold); color: var(--navy); }
+.btn-gold:hover { background: #d49000; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(240,165,0,.4); }
+.btn-outline { background: white; color: var(--navy); border: 2px solid var(--light-gray); }
+.btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+.btn-danger { background: var(--red-light); color: var(--red); border: 2px solid #f5c6c3; }
+.btn-danger:hover { background: var(--red); color: white; }
+.btn-green { background: var(--green); color: white; }
+.btn-sm { padding: 6px 14px; font-size: 12px; }
+.btn-xs { padding: 3px 9px; font-size: 11px; }
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+.stat-label { font-size: 11px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+.stat-value { font-size: 32px; font-weight: 700; color: var(--navy); line-height: 1; }
+.stat-sub { font-size: 12px; color: var(--gray); margin-top: 6px; }
+.s-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.chip-green { background: var(--green-light); color: var(--green); }
+.chip-amber { background: var(--amber-light); color: var(--amber); }
+.chip-red { background: var(--red-light); color: var(--red); }
+.chip-blue { background: var(--blue-light); color: var(--blue); }
+.chip-purple { background: var(--reg-n-light); color: var(--reg-n); }
+.progress-bar { background: var(--light-gray); border-radius: 10px; height: 6px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--blue), var(--gold)); transition: width .8s cubic-bezier(.4,0,.2,1); }
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 12px; font-weight: 600; color: var(--navy); margin-bottom: 5px; }
+.form-input, .form-select { width: 100%; padding: 9px 14px; border: 2px solid var(--light-gray); border-radius: var(--radius-sm); font-family: 'DM Sans'; font-size: 13px; color: var(--navy); background: white; transition: border-color .2s; }
+.form-input:focus, .form-select:focus { outline: none; border-color: var(--blue); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.info-box { background: var(--blue-light); border-left: 4px solid var(--blue); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 12px 16px; font-size: 13px; color: var(--navy); margin-bottom: 16px; line-height: 1.5; }
+.callout { border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; line-height: 1.6; margin-bottom: 16px; display: flex; gap: 10px; }
+.callout-n { background: var(--reg-n-light); border-left: 4px solid var(--reg-n); color: #3d1680; }
+.callout-z { background: var(--reg-z-light); border-left: 4px solid var(--reg-z); color: #7a1a10; }
+.callout-both { background: var(--reg-both-light); border-left: 4px solid var(--reg-both); color: #7a3200; }
+.callout-info { background: var(--blue-light); border-left: 4px solid var(--blue); color: var(--navy); }
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-up { animation: fadeUp .3s ease forwards; }
+
+/* ── GRADE PILLS ── */
+.grade-pill { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+.grade-A { background: var(--green-light); color: var(--green); }
+.grade-B { background: var(--blue-light); color: var(--blue); }
+.grade-C { background: var(--amber-light); color: var(--amber); }
+.grade-D { background: #fff0e0; color: #e67e22; }
+.grade-N { background: var(--red-light); color: var(--red); }
+.sail-grades { display: flex; gap: 6px; }
+
+/* ── CLIENT TABLE ── */
+.client-table { width: 100%; border-collapse: collapse; }
+.client-table th { text-align: left; font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: .06em; padding: 10px 14px; border-bottom: 2px solid var(--light-gray); }
+.client-table td { padding: 13px 14px; border-bottom: 1px solid var(--light-gray); font-size: 13px; vertical-align: middle; }
+.client-table tr:last-child td { border-bottom: none; }
+.client-table tr:hover td { background: var(--off-white); }
+
+/* ── DUCK PROGRESS ── */
+.duck-hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #1e3a70 100%);
+  border-radius: 20px; padding: 32px; margin-bottom: 24px; position: relative; overflow: hidden;
+}
+.duck-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 50%, rgba(240,165,0,.12) 0%, transparent 60%); }
+.duck-hero-title { color: rgba(255,255,255,.7); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
+.duck-hero-heading { font-family: 'Playfair Display', serif; color: white; font-size: 22px; margin-bottom: 24px; }
+.duck-row-visual { display: flex; align-items: flex-end; justify-content: center; gap: 20px; margin: 20px 0; min-height: 110px; position: relative; }
+.duck-row-visual::after { content: ''; position: absolute; bottom: 0; left: 8%; right: 8%; height: 2px; background: rgba(255,255,255,.12); border-radius: 2px; }
+.duck-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 1.2s cubic-bezier(.34,1.56,.64,1); }
+.duck-svg { transition: all 1s ease; filter: drop-shadow(0 4px 8px rgba(0,0,0,.3)); }
+.duck-pct { font-size: 15px; font-weight: 700; color: white; }
+.duck-pct.met { color: var(--gold); }
+.duck-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+.sail-meters { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 20px; }
+.sail-meter { background: rgba(255,255,255,.08); border-radius: 10px; padding: 12px; }
+.sail-meter-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+.sail-meter-lbl { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.65); letter-spacing: .06em; }
+.sail-meter-pct { font-size: 17px; font-weight: 700; color: white; }
+.sail-meter-pct.met { color: var(--gold); }
+.sail-meter-bar { background: rgba(255,255,255,.15); border-radius: 6px; height: 7px; overflow: hidden; }
+.sail-meter-fill { height: 100%; border-radius: 6px; transition: width 1s ease; }
+.fill-score { background: linear-gradient(90deg,#2980b9,#6dd5fa); }
+.fill-assets { background: linear-gradient(90deg,#27ae60,#a8e063); }
+.fill-income { background: linear-gradient(90deg,#f39c12,#f1c40f); }
+.fill-liabilities { background: linear-gradient(90deg,#8e44ad,#c39bd3); }
+.sail-meter-thresh { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 4px; }
+
+/* ── LEARNING ── */
+.module-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 16px; margin-bottom: 24px; }
+.module-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; cursor: pointer; transition: all .2s; border: 2px solid transparent; }
+.module-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--blue); }
+.module-card.locked { opacity: .6; cursor: not-allowed; }
+.module-card.locked:hover { transform: none; box-shadow: var(--shadow); border-color: transparent; }
+.module-card.completed { border-color: var(--green); }
+.module-thumb { height: 90px; display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+.thumb-score { background: linear-gradient(135deg,#1a2744,#2453a0); }
+.thumb-assets { background: linear-gradient(135deg,#1a4a2e,#27ae60); }
+.thumb-income { background: linear-gradient(135deg,#4a2e00,#f39c12); }
+.thumb-liabilities { background: linear-gradient(135deg,#2e1a4a,#8e44ad); }
+.thumb-mortgage { background: linear-gradient(135deg,#1a3a4a,#16a085); }
+.thumb-process { background: linear-gradient(135deg,#4a1a2e,#e74c3c); }
+.module-badge { position: absolute; top: 8px; right: 8px; padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 700; }
+.mbadge-done { background: var(--green); color: white; }
+.mbadge-locked { background: rgba(0,0,0,.4); color: white; }
+.mbadge-new { background: var(--gold); color: var(--navy); }
+.module-info { padding: 14px 16px; }
+.module-info h3 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.module-info p { font-size: 12px; color: var(--gray); line-height: 1.5; margin-bottom: 8px; }
+.module-meta { display: flex; gap: 12px; font-size: 11px; color: var(--gray); }
+
+/* ── LESSON ── */
+.lesson-container { max-width: 720px; }
+.lesson-back { background: none; border: 2px solid var(--light-gray); border-radius: var(--radius-sm); padding: 7px 14px; cursor: pointer; font-family: 'DM Sans'; font-size: 13px; color: var(--navy); margin-bottom: 20px; transition: all .2s; }
+.lesson-back:hover { border-color: var(--blue); color: var(--blue); }
+.lesson-banner { border-radius: 14px; height: 160px; display: flex; align-items: center; justify-content: center; font-size: 64px; margin-bottom: 24px; }
+.lesson-body { background: white; border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); margin-bottom: 20px; }
+.lesson-body h2 { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 14px; }
+.lesson-body h3 { font-size: 15px; font-weight: 600; margin: 18px 0 10px; color: var(--blue); }
+.lesson-body p { font-size: 14px; line-height: 1.75; color: #2d3748; margin-bottom: 12px; }
+.lesson-body ul { padding-left: 20px; margin-bottom: 12px; }
+.lesson-body ul li { font-size: 14px; line-height: 1.7; color: #2d3748; margin-bottom: 5px; }
+.lesson-hl { background: linear-gradient(135deg,var(--navy),#243a6e); border-radius: 10px; padding: 18px 22px; color: white; margin: 18px 0; }
+.lesson-hl p { color: rgba(255,255,255,.85); margin: 0; font-size: 13px; line-height: 1.7; }
+.lesson-hl strong { color: var(--gold); }
+.video-placeholder { background: #0f1b35; border-radius: 12px; height: 190px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all .2s; border: 2px solid rgba(255,255,255,.1); margin-bottom: 20px; position: relative; overflow: hidden; }
+.video-placeholder:hover { border-color: var(--gold); }
+.video-placeholder::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(240,165,0,.08) 0%, transparent 70%); }
+.play-btn { width: 52px; height: 52px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--navy); position: relative; z-index: 1; box-shadow: 0 0 0 8px rgba(240,165,0,.15); transition: transform .2s; }
+.video-placeholder:hover .play-btn { transform: scale(1.1); }
+.video-lbl { color: rgba(255,255,255,.65); font-size: 13px; position: relative; z-index: 1; }
+.video-sub { color: rgba(255,255,255,.35); font-size: 11px; font-style: italic; position: relative; z-index: 1; }
+.pro-tip { background: var(--gold-light); border: 2px solid var(--gold); border-radius: 10px; padding: 14px 18px; display: flex; gap: 12px; margin: 16px 0; }
+.pro-tip-icon { font-size: 20px; flex-shrink: 0; }
+.pro-tip-content strong { font-size: 13px; color: var(--navy); display: block; margin-bottom: 3px; }
+.pro-tip-content p { font-size: 13px; color: #5a4a00; margin: 0; line-height: 1.5; }
+.quiz-section { background: white; border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); margin-bottom: 20px; }
+.quiz-section h3 { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
+.quiz-q { font-size: 14px; color: var(--navy); margin-bottom: 12px; line-height: 1.5; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 11px 16px; border: 2px solid var(--light-gray); border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-family: 'DM Sans'; color: var(--navy); background: white; text-align: left; transition: all .2s; }
+.quiz-opt:hover { border-color: var(--blue); background: var(--blue-light); }
+.quiz-opt.correct { border-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 600; }
+.quiz-opt.wrong { border-color: var(--red); background: var(--red-light); color: var(--red); }
+.quiz-feedback { padding: 10px 14px; border-radius: var(--radius-sm); margin-top: 10px; font-size: 13px; line-height: 1.5; display: none; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: var(--green-light); color: var(--green); }
+.quiz-feedback.wrong { background: var(--red-light); color: var(--red); }
+.lesson-nav { display: flex; justify-content: space-between; align-items: center; }
+
+/* ── CHECKLIST ── */
+.check-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 6px; background: var(--off-white); cursor: pointer; transition: background .15s; }
+.check-item:hover { background: var(--light-gray); }
+.check-item.checked { background: var(--green-light); }
+.check-box { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--light-gray); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; background: white; transition: all .2s; }
+.check-item.checked .check-box { background: var(--green); border-color: var(--green); color: white; }
+.check-label { font-size: 13px; color: var(--navy); }
+.check-item.checked .check-label { color: var(--green); text-decoration: line-through; opacity: .8; }
+
+/* ── MILESTONES ── */
+.milestone-track { display: flex; flex-direction: column; position: relative; padding-left: 32px; }
+.milestone-track::before { content: ''; position: absolute; left: 10px; top: 18px; bottom: 18px; width: 2px; background: var(--light-gray); }
+.milestone-item { position: relative; padding: 10px 0 10px 18px; }
+.m-dot { position: absolute; left: -20px; top: 13px; width: 18px; height: 18px; border-radius: 50%; background: var(--light-gray); border: 3px solid white; z-index: 1; }
+.milestone-item.done .m-dot { background: var(--green); }
+.milestone-item.now .m-dot { background: var(--gold); box-shadow: 0 0 0 4px rgba(240,165,0,.2); }
+.milestone-item h4 { font-size: 14px; font-weight: 600; color: var(--navy); }
+.milestone-item p { font-size: 12px; color: var(--gray); margin-top: 2px; }
+.milestone-item.done h4 { color: var(--green); }
+
+/* ── CELEBRATION ── */
+#screen-celebration {
+  background: linear-gradient(135deg,#0a1628 0%,#1a2744 40%,#0d3320 100%);
+  align-items: center; justify-content: center; padding: 24px; position: relative; overflow: hidden;
+}
+.confetti-bg { position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(circle,rgba(255,215,0,.15) 1px,transparent 1px),radial-gradient(circle,rgba(36,83,160,.2) 1px,transparent 1px);
+  background-size: 40px 40px, 70px 70px; animation: bgmove 8s linear infinite; }
+@keyframes bgmove{0%{background-position:0 0,0 0}100%{background-position:40px 40px,70px 70px}}
+.celeb-card { background: white; border-radius: 28px; padding: 52px 44px; width: 100%; max-width: 540px; box-shadow: 0 20px 80px rgba(0,0,0,.4); text-align: center; position: relative; z-index: 1; animation: celebPop .6s cubic-bezier(.34,1.56,.64,1); }
+@keyframes celebPop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.celeb-ducks { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+.celeb-duck { font-size: 46px; animation: celebBounce 1s ease-in-out infinite; }
+.celeb-duck:nth-child(1){animation-delay:0s}.celeb-duck:nth-child(2){animation-delay:.1s}.celeb-duck:nth-child(3){animation-delay:.2s}.celeb-duck:nth-child(4){animation-delay:.3s}
+@keyframes celebBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.celeb-badge { width: 90px; height: 90px; margin: 0 auto 18px; background: linear-gradient(135deg,var(--gold),#ff8c00); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 44px; box-shadow: 0 0 0 8px rgba(240,165,0,.15),0 0 0 16px rgba(240,165,0,.07); animation: badgePulse 2s ease-in-out infinite; }
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 8px rgba(240,165,0,.15),0 0 0 16px rgba(240,165,0,.07)}50%{box-shadow:0 0 0 12px rgba(240,165,0,.2),0 0 0 24px rgba(240,165,0,.05)}}
+.celeb-title { font-family: 'Playfair Display', serif; font-size: 30px; color: var(--navy); margin-bottom: 10px; }
+.celeb-sub { font-size: 15px; color: var(--gray); line-height: 1.6; margin-bottom: 24px; }
+.celeb-sail { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 24px; }
+.celeb-sail-item { background: var(--off-white); border-radius: 10px; padding: 12px 8px; }
+.celeb-sail-lbl { font-size: 10px; font-weight: 700; color: var(--gray); letter-spacing: .1em; margin-bottom: 4px; }
+.celeb-sail-grade { font-size: 22px; font-weight: 700; }
+.advisor-box { background: var(--navy); border-radius: 14px; padding: 20px; display: flex; align-items: center; gap: 14px; margin-bottom: 18px; text-align: left; }
+.advisor-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--gold); color: var(--navy); font-weight: 700; font-size: 17px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.advisor-info strong { color: white; font-size: 15px; display: block; }
+.advisor-info span { color: rgba(255,255,255,.6); font-size: 12px; }
+.badge-row { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 18px; background: linear-gradient(135deg,var(--gold-light),#fff3cc); border-radius: 12px; border: 2px solid var(--gold); }
+
+/* ── COMPLIANCE ── */
+.comp-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.comp-badge.reg-n { background: var(--reg-n-light); color: var(--reg-n); border: 1px solid rgba(123,47,247,.2); }
+.comp-badge.reg-z { background: var(--reg-z-light); color: var(--reg-z); border: 1px solid rgba(192,57,43,.2); }
+.comp-badge.reg-both { background: var(--reg-both-light); color: var(--reg-both); border: 1px solid rgba(212,93,0,.2); }
+.comp-badge.reg-safe { background: var(--reg-safe-light); color: var(--reg-safe); border: 1px solid rgba(26,158,92,.2); }
+.risk-ind { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.risk-high { background: var(--red-light); color: var(--red); }
+.risk-medium { background: var(--amber-light); color: var(--amber); }
+.risk-low { background: var(--green-light); color: var(--green); }
+.comp-field { border-radius: var(--radius-sm); margin-bottom: 14px; border: 2px solid transparent; transition: border-color .2s; }
+.comp-field.risk-high { border-color: rgba(192,57,43,.25); background: rgba(255,240,238,.4); }
+.comp-field.risk-medium { border-color: rgba(212,93,0,.2); background: rgba(255,244,236,.4); }
+.comp-field.risk-low { border-color: rgba(26,158,92,.15); background: rgba(230,247,239,.3); }
+.comp-field-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px 8px; flex-wrap: wrap; }
+.comp-field-body { padding: 0 14px 12px; }
+.comp-field-value { background: white; border: 2px solid var(--light-gray); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; color: var(--navy); }
+.comp-field-value.needs-review { border-color: var(--amber); background: var(--amber-light); }
+.comp-field-disclaimer { margin-top: 8px; padding: 8px 12px; background: rgba(26,39,68,.05); border-radius: 6px; font-size: 11px; color: var(--gray); line-height: 1.5; display: flex; gap: 6px; }
+.comp-stat { background: white; border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); border-top: 3px solid transparent; }
+.comp-stat.danger { border-top-color: var(--red); }
+.comp-stat.warning { border-top-color: var(--amber); }
+.comp-stat.success { border-top-color: var(--green); }
+.comp-stat.info { border-top-color: var(--blue); }
+.comp-stat-label { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px; }
+.comp-stat-value { font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; }
+.comp-stat-sub { font-size: 11px; color: var(--gray); margin-top: 5px; }
+.status-chip { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.sc-approved { background: var(--green-light); color: var(--green); }
+.sc-review { background: var(--red-light); color: var(--red); }
+.sc-draft { background: var(--blue-light); color: var(--blue); }
+.audit-row { display: grid; grid-template-columns: 150px 80px 1fr 100px; gap: 12px; padding: 9px 16px; border-bottom: 1px solid var(--light-gray); font-size: 12px; font-family: 'DM Mono',monospace; align-items: center; }
+.audit-row.hdr { background: var(--navy); color: white; font-weight: 600; border-radius: var(--radius-sm) var(--radius-sm) 0 0; }
+.audit-row:hover:not(.hdr) { background: var(--off-white); }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--light-gray); }
+.toggle-row:last-child { border-bottom: none; }
+.toggle-lbl { font-size: 13px; color: var(--navy); }
+.toggle-lbl small { display: block; font-size: 11px; color: var(--gray); margin-top: 2px; }
+.toggle { width: 40px; height: 22px; border-radius: 11px; cursor: pointer; position: relative; transition: background .2s; flex-shrink: 0; }
+.toggle.on { background: var(--blue); }
+.toggle.off { background: var(--light-gray); }
+.toggle-knob { position: absolute; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: white; transition: all .2s; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+.toggle.on .toggle-knob { left: 21px; }
+.toggle.off .toggle-knob { left: 3px; }
+.disclaimer-preview { background: var(--off-white); border: 1.5px dashed var(--light-gray); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 11px; color: var(--gray); line-height: 1.6; font-style: italic; }
+
+/* ── CLIENT COMP DISPLAY ── */
+.client-comp-wrap { border-radius: var(--radius-sm); border: 1.5px solid var(--light-gray); margin-bottom: 16px; overflow: hidden; }
+.client-comp-bar { padding: 6px 14px; display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; }
+.client-comp-bar.reg-n { background: var(--reg-n-light); color: var(--reg-n); }
+.client-comp-bar.reg-z { background: var(--reg-z-light); color: var(--reg-z); }
+.client-comp-bar.reg-both { background: var(--reg-both-light); color: var(--reg-both); }
+.client-comp-content { padding: 14px 16px; }
+.client-comp-disc { background: var(--off-white); padding: 8px 16px; font-size: 11px; color: var(--gray); line-height: 1.5; border-top: 1px solid var(--light-gray); display: flex; gap: 6px; }
+
+/* ── MODAL ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(26,39,68,.6); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: 18px; padding: 28px; width: 100%; max-width: 560px; box-shadow: var(--shadow-lg); animation: fadeUp .25s ease; max-height: 90vh; overflow-y: auto; }
+.modal-hdr { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; gap: 12px; }
+.modal-hdr h2 { font-family: 'Playfair Display', serif; font-size: 20px; }
+.modal-close { background: var(--off-white); border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.modal-close:hover { background: var(--light-gray); }
+.modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--light-gray); }
+.comp-input { width: 100%; padding: 9px 14px; border: 2px solid var(--light-gray); border-radius: var(--radius-sm); font-family: 'DM Sans'; font-size: 13px; color: var(--navy); transition: border-color .2s; }
+.comp-input:focus { outline: none; border-color: var(--blue); }
+.comp-textarea { width: 100%; padding: 9px 14px; border: 2px solid var(--light-gray); border-radius: var(--radius-sm); font-family: 'DM Sans'; font-size: 13px; color: var(--navy); resize: vertical; min-height: 70px; transition: border-color .2s; }
+.comp-textarea:focus { outline: none; border-color: var(--blue); }
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .content-area{padding:16px}
+  .form-row{grid-template-columns:1fr}
+  .sail-meters{grid-template-columns:1fr 1fr}
+  .audit-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════ LOGIN ══════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-card fade-up">
+    <div class="login-ducks">
+      <span class="login-duck">🦆</span><span class="login-duck">🦆</span><span class="login-duck">🦆</span><span class="login-duck">🦆</span>
+    </div>
+    <div class="login-brand">DucksInARow</div>
+    <div class="login-tagline">Homebuyer Readiness Platform</div>
+    <div class="login-domain">duckandkey.com</div>
+    <div class="login-divider">Sign in as</div>
+    <button class="role-btn" onclick="goTo('pro')">
+      <span class="role-icon">💼</span>
+      <div class="role-text"><strong>Chris Basham</strong><span>Loan Officer — Premier Mortgage Group · NMLS 1929240</span></div>
+    </button>
+    <button class="role-btn" onclick="goTo('client')">
+      <span class="role-icon">🏠</span>
+      <div class="role-text"><strong>Jamie Rodriguez</strong><span>Client — My Readiness Portal</span></div>
+    </button>
+    <button class="role-btn" onclick="goTo('celebration')">
+      <span class="role-icon">🎉</span>
+      <div class="role-text"><strong>Preview Celebration Screen</strong><span>When all ducks are in a row</span></div>
+    </button>
+    <div class="login-note">Clickable prototype — select a role to explore</div>
+  </div>
+</div>
+
+<!-- ══════ PRO SCREEN ══════ -->
+<div id="screen-pro" class="screen">
+  <nav class="topnav">
+    <div class="topnav-brand"><button class="hamburger" onclick="toggleSidebar('pro')">☰</button> 🦆 <span>DucksInARow</span></div>
+    <div class="topnav-right">
+      <div class="nav-user"><div class="avatar">CB</div><span>Chris Basham</span></div>
+      <button class="logout-btn" onclick="goTo('login')">Log out</button>
+    </div>
+  </nav>
+  <div class="sidebar-overlay" id="pro-overlay" onclick="toggleSidebar('pro')"></div>
+  <div class="main-layout">
+    <div class="sidebar" id="pro-sb">
+      <div class="sidebar-section">Overview</div>
+      <div class="sidebar-item active" onclick="pro('dashboard')"><span class="s-icon">📊</span>Dashboard</div>
+      <div class="sidebar-item" onclick="pro('clients')"><span class="s-icon">👥</span>Clients</div>
+      <div class="sidebar-section">Tools</div>
+      <div class="sidebar-item" onclick="openModal('invite-modal')"><span class="s-icon">✉️</span>Invite Client</div>
+      <div class="sidebar-item" onclick="pro('thresholds')"><span class="s-icon">🎯</span>Set Thresholds</div>
+      <div class="sidebar-item" onclick="pro('branding')"><span class="s-icon">🎨</span>My Branding</div>
+      <div class="sidebar-section">Compliance</div>
+      <div class="sidebar-item" onclick="pro('comp-overview')"><span class="s-icon">🛡️</span>Overview<span class="s-badge red">3</span></div>
+      <div class="sidebar-item" onclick="pro('comp-editor')"><span class="s-icon">✏️</span>Content Editor<span class="s-badge amber">5</span></div>
+      <div class="sidebar-item" onclick="pro('comp-audit')"><span class="s-icon">🗂️</span>Audit Log<span class="s-badge green">24mo</span></div>
+      <div class="sidebar-section">Account</div>
+      <div class="sidebar-item" onclick="pro('settings')"><span class="s-icon">⚙️</span>Settings</div>
+    </div>
+    <div class="content-area" id="pro-content"></div>
+  </div>
+</div>
+
+<!-- ══════ CLIENT SCREEN ══════ -->
+<div id="screen-client" class="screen">
+  <nav class="topnav">
+    <div class="topnav-brand"><button class="hamburger" onclick="toggleSidebar('client')">☰</button> 🦆 <span>DucksInARow</span></div>
+    <div class="topnav-right">
+      <div class="nav-user"><div class="avatar client">JR</div><span>Jamie Rodriguez</span></div>
+      <button class="logout-btn" onclick="goTo('login')">Log out</button>
+    </div>
+  </nav>
+  <div class="sidebar-overlay" id="client-overlay" onclick="toggleSidebar('client')"></div>
+  <div class="main-layout">
+    <div class="sidebar" id="client-sb">
+      <div class="sidebar-section">My Journey</div>
+      <div class="sidebar-item active" onclick="client('overview')"><span class="s-icon">🏠</span>Overview</div>
+      <div class="sidebar-item" onclick="client('ducks')"><span class="s-icon">🦆</span>My Ducks</div>
+      <div class="sidebar-item" onclick="client('learn')"><span class="s-icon">🎓</span>Learn</div>
+      <div class="sidebar-item" onclick="client('sail')"><span class="s-icon">⛵</span>S.A.I.L. Assessment</div>
+      <div class="sidebar-item" onclick="client('docs')"><span class="s-icon">📁</span>Documents</div>
+      <div class="sidebar-item" onclick="client('milestones')"><span class="s-icon">🎯</span>Milestones</div>
+      <div class="sidebar-section">My Advisor</div>
+      <div class="sidebar-item" onclick="client('advisor')"><span class="s-icon">👤</span>Chris Basham</div>
+    </div>
+    <div class="content-area" id="client-content"></div>
+  </div>
+</div>
+
+<!-- ══════ CELEBRATION ══════ -->
+<div id="screen-celebration" class="screen">
+  <div class="confetti-bg"></div>
+  <div class="celeb-card">
+    <div class="celeb-ducks">
+      <span class="celeb-duck">🦆</span><span class="celeb-duck">🦆</span><span class="celeb-duck">🦆</span><span class="celeb-duck">🦆</span>
+    </div>
+    <div class="celeb-badge">🏆</div>
+    <div class="celeb-title">Your Ducks Are In A Row!</div>
+    <div class="celeb-sub">Congratulations Jamie — you've met every readiness threshold set by your advisor. You're officially ready to start the mortgage process!</div>
+    <div class="celeb-sail">
+      <div class="celeb-sail-item"><div class="celeb-sail-lbl">SCORE</div><div class="celeb-sail-grade" style="color:var(--green)">A</div></div>
+      <div class="celeb-sail-item"><div class="celeb-sail-lbl">ASSETS</div><div class="celeb-sail-grade" style="color:var(--green)">A</div></div>
+      <div class="celeb-sail-item"><div class="celeb-sail-lbl">INCOME</div><div class="celeb-sail-grade" style="color:var(--blue)">B</div></div>
+      <div class="celeb-sail-item"><div class="celeb-sail-lbl">LIABILITIES</div><div class="celeb-sail-grade" style="color:var(--blue)">B</div></div>
+    </div>
+    <div class="advisor-box">
+      <div class="advisor-avatar">CB</div>
+      <div style="flex:1">
+        <div class="advisor-info"><strong>Contact Chris Basham</strong><span>Your loan officer is ready to take the next step with you.</span></div>
+        <div style="display:flex;gap:10px;margin-top:10px">
+          <a href="tel:6159940112" class="btn btn-gold btn-sm">📞 Call Now</a>
+          <button class="btn btn-outline btn-sm" style="color:white;border-color:rgba(255,255,255,.3)">✉️ Message</button>
+        </div>
+      </div>
+    </div>
+    <div class="badge-row">
+      <span style="font-size:26px">🏅</span>
+      <div style="text-align:left"><span style="display:block;font-weight:700;font-size:13px">Homebuyer Readiness Badge Earned</span><span style="font-size:12px;color:var(--gray)">Share your achievement!</span></div>
+      <button class="btn btn-gold btn-sm" style="margin-left:auto">Share</button>
+    </div>
+    <button class="btn btn-outline" style="width:100%;margin-top:16px" onclick="goTo('client');client('overview')">← Back to My Portal</button>
+  </div>
+</div>
+
+<!-- ══════ MODALS ══════ -->
+<div class="modal-overlay" id="invite-modal">
+  <div class="modal">
+    <div class="modal-hdr"><h2>✉️ Invite a New Client</h2><button class="modal-close" onclick="closeModal('invite-modal')">✕</button></div>
+    <p style="font-size:14px;color:var(--gray);margin-bottom:18px">Send your client a personalized link to their readiness portal, branded with your info.</p>
+    <div class="form-group"><label class="form-label">Client's Full Name</label><input class="form-input" placeholder="e.g. Sarah Johnson"/></div>
+    <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" placeholder="sarah@email.com"/></div>
+    <div class="form-group"><label class="form-label">Goal Timeline</label><select class="form-select"><option>ASAP</option><option>6–12 Months</option><option>1–3 Years</option><option>3+ Years</option></select></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('invite-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="closeModal('invite-modal')">Send Invite 🚀</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div>
+        <h2 id="modal-title">Edit Content</h2>
+        <div id="modal-badges" style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('edit-modal')">✕</button>
+    </div>
+    <div id="modal-callout"></div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Regulation Context</div>
+      <div id="modal-reg-context" style="font-size:13px;color:var(--navy);line-height:1.6;background:var(--off-white);border-radius:var(--radius-sm);padding:12px 14px;"></div>
+    </div>
+    <div class="form-group"><label class="form-label" id="modal-field-lbl">Content</label><textarea class="comp-textarea" id="modal-field-input" rows="4"></textarea></div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Required Disclaimer</div>
+      <div class="form-group"><label class="form-label">Disclaimer Text <span style="color:var(--red);font-size:11px">* Required</span></label><textarea class="comp-textarea" id="modal-disc-input" rows="3"></textarea></div>
+      <div style="font-size:11px;color:var(--gray);margin-bottom:6px">Preview as shown to client:</div>
+      <div class="disclaimer-preview" id="modal-disc-preview"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Reviewed By</label><input class="comp-input" value="Chris Basham, NMLS 1929240"/></div>
+      <div class="form-group"><label class="form-label">Review Date</label><input class="comp-input" type="date" value="2026-03-29"/></div>
+    </div>
+    <div class="callout callout-info" style="font-size:12px">📁 This edit is saved to your 24-month compliance audit log as required by Regulation N (12 CFR Part 1014).</div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('edit-modal')">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="flagItem(currentEditItem?.id)">⚠ Flag for Review</button>
+      <button class="btn btn-gold" onclick="saveEdit()">Save & Log ✓</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const thresholds = { score:70, assets:70, income:70, liabilities:70 };
+let checkStates = {};
+let currentLesson = null;
+let currentEditItem = null;
+let quizAnswered = false;
+
+const complianceItems = [
+  { id:'down-pct', title:'Down Payment Percentages', location:'Learn → Loan Programs / S.A.I.L. Assessment', risk:'high', regs:['reg-n','reg-z'],
+    regContext:'Regulation N prohibits misrepresenting minimum down payment required. Regulation Z classifies down payment percentages as "trigger terms" requiring full disclosure of repayment terms and APR. These must reflect what you actually offer.',
+    currentValue:'• USDA/RD — 0%\n• VA — 0%\n• Conventional (Home Ready) — 3%\n• Conventional (First Time) — 3%\n• FHA — 3.5%\n• Conventional (Owner Occupied) — 5%\n• Conventional (2nd Home) — 10%\n• Conventional (Investment) — 20%',
+    disclaimer:'Down payment requirements shown are minimums and may vary based on credit score, loan program guidelines, lender overlays, and individual qualification. Not all programs available to all borrowers. Contact Chris Basham, NMLS 1929240. Not a commitment to lend.',
+    status:'approved', lastReviewed:'Mar 11, 2026', reviewedBy:'Chris Basham' },
+  { id:'monthly-pmt', title:'Estimated Monthly Payment', location:'S.A.I.L. DTI Calculator / Client Overview', risk:'high', regs:['reg-z'],
+    regContext:'Under Reg Z §1026.24, any stated monthly payment is a trigger term requiring disclosure of down payment, full payment schedule, and APR. Assumptions used to calculate the estimate must be clearly stated.',
+    currentValue:'Estimated Monthly Payment: $1,600/mo\nBased on: $280,000 purchase · 7.25% rate · 30-yr term · 5% down · est. taxes/insurance',
+    disclaimer:'Monthly payment shown is an estimate only, based on assumed interest rate, loan term, and purchase price. Actual payment will vary. APR and full payment schedule provided at loan application. Not a commitment to lend. Chris Basham, NMLS 1929240.',
+    status:'needs-review', lastReviewed:'Feb 28, 2026', reviewedBy:'Chris Basham' },
+  { id:'closing-pct', title:'Closing Cost Estimate (3.5%)', location:'S.A.I.L. Assets / Learn → Down Payment', risk:'high', regs:['reg-n'],
+    regContext:'Reg N prohibits omitting or downplaying mandatory fees. A flat 3.5% closing cost estimate without disclosure that actual costs vary significantly could constitute misrepresentation.',
+    currentValue:'Estimate 3.5% of home price for closing costs in your planning calculations.',
+    disclaimer:'The 3.5% closing cost estimate is a general planning guideline only. Actual closing costs vary by loan type, location, lender, title, and other factors. A Loan Estimate with actual costs will be provided within 3 business days of application. Chris Basham, NMLS 1929240.',
+    status:'approved', lastReviewed:'Mar 11, 2026', reviewedBy:'Chris Basham' },
+  { id:'dti-guide', title:'DTI Guideline (45%)', location:'S.A.I.L. Assessment → Income/Liabilities', risk:'medium', regs:['reg-n'],
+    regContext:'Stating a specific DTI threshold without disclosure that it is a guideline — not a universal qualification standard — may misrepresent loan eligibility under Reg N. DTI limits vary by program.',
+    currentValue:'45% is a general DTI guideline. Actual maximum depends on the loan program you qualify for.',
+    disclaimer:'DTI thresholds shown are general guidelines, not guarantees of approval. Maximum DTI varies by loan program, lender, and compensating factors. Contact Chris Basham, NMLS 1929240.',
+    status:'approved', lastReviewed:'Mar 5, 2026', reviewedBy:'Chris Basham' },
+  { id:'score-grades', title:'Credit Score Grading Scale', location:'S.A.I.L. Score Section / My Ducks', risk:'medium', regs:['reg-n'],
+    regContext:'Reg N prohibits misrepresenting loan eligibility. The grading scale must be presented as an educational tool, not a qualification guarantee, since actual program eligibility varies by lender and loan type.',
+    currentValue:'A = 760+  |  B = 700–759  |  C = 620–699  |  D = 580–619  |  N = 579 or less',
+    disclaimer:'Credit score grades are for educational and planning purposes only. Actual loan eligibility depends on your complete credit profile and specific loan program. Contact Chris Basham, NMLS 1929240.',
+    status:'approved', lastReviewed:'Mar 5, 2026', reviewedBy:'Chris Basham' },
+  { id:'reserves', title:'Reserves Guideline (6 months)', location:'S.A.I.L. Assets Section', risk:'medium', regs:['reg-n'],
+    regContext:'Stating a specific reserve requirement could misrepresent actual program requirements. Requirements vary from zero to 12+ months depending on program. Must be disclosed as a planning guideline.',
+    currentValue:'Aim to have at least 6 months of housing payments in reserve after closing.',
+    disclaimer:'Reserve requirements vary by loan program. Some programs require no reserves; others may require 2–12 months. This is for planning purposes only. Chris Basham, NMLS 1929240.',
+    status:'needs-review', lastReviewed:'Feb 20, 2026', reviewedBy:'Chris Basham' },
+  { id:'affordability', title:'Affordability Calculator Results', location:'S.A.I.L. Assets / Client Overview', risk:'high', regs:['reg-n','reg-z'],
+    regContext:'Calculator results producing a home price, payment, or loan amount are subject to both Reg N (qualification misrepresentation) and Reg Z (trigger terms requiring APR). Assumptions must be fully disclosed.',
+    currentValue:'Calculator assumes entered rate, 30-yr term, estimated taxes/insurance 1.5%/yr, entered income and liabilities.',
+    disclaimer:'Affordability estimates are based on general assumptions and are not pre-qualification or pre-approval. Actual loan amount may differ. APR and full terms provided upon application. Not a commitment to lend. Chris Basham, NMLS 1929240, Premier Mortgage Group, NMLS 2284107.',
+    status:'draft', lastReviewed:'Mar 1, 2026', reviewedBy:'Chris Basham' },
+  { id:'doc-checklist', title:'Document Checklist', location:'Client Portal → Documents', risk:'low', regs:[],
+    regContext:'Document checklists listing items needed for a loan application are specifically permitted without triggering MAP Rule or Reg Z, as long as no loan terms, rates, or payments are stated alongside them.',
+    currentValue:'Standard documentation checklist: ID, income docs, asset statements, property docs.',
+    disclaimer:'', status:'approved', lastReviewed:'Mar 11, 2026', reviewedBy:'Chris Basham' },
+  { id:'sail-framework', title:'S.A.I.L. Framework (Educational)', location:'All pages — core concept', risk:'low', regs:[],
+    regContext:'The S.A.I.L. framework description is educational content about the mortgage process and does not constitute advertising of specific loan terms. Safe as-is.',
+    currentValue:'S = Score (Credit), A = Assets, I = Income, L = Liabilities — the four pillars of mortgage readiness.',
+    disclaimer:'', status:'approved', lastReviewed:'Mar 11, 2026', reviewedBy:'Chris Basham' },
+];
+
+const auditLog = [
+  {ts:'2026-03-11 09:14',user:'Chris B.',action:'Approved: Down Payment Percentages — annual review',status:'approved'},
+  {ts:'2026-03-11 09:10',user:'Chris B.',action:'Approved: Closing Cost Estimate — updated disclaimer',status:'approved'},
+  {ts:'2026-03-11 09:05',user:'Chris B.',action:'Approved: Credit Score Grading Scale — no changes',status:'approved'},
+  {ts:'2026-03-05 14:22',user:'Chris B.',action:'Flagged: Monthly Payment Field — needs updated rate assumption',status:'flagged'},
+  {ts:'2026-03-05 14:18',user:'Chris B.',action:'Approved: DTI Guideline — disclaimer updated',status:'approved'},
+  {ts:'2026-03-01 11:30',user:'Chris B.',action:'Draft created: Affordability Calculator content block',status:'draft'},
+  {ts:'2026-02-28 16:45',user:'Chris B.',action:'Flagged: Reserves Guidance — needs program-specific review',status:'flagged'},
+  {ts:'2026-01-15 08:30',user:'Chris B.',action:'Approved: Document Checklist — no regulated content',status:'approved'},
+];
+
+const modules = [
+  {id:'mortgage',icon:'🏦',thumb:'thumb-mortgage',title:'What Is a Mortgage?',desc:'Understand how home loans work from application to keys in hand.',time:'8 min',lessons:3,status:'completed'},
+  {id:'credit',icon:'💳',thumb:'thumb-score',title:'Understanding Your Credit Score',desc:'Deep dive into how credit scores are calculated and how to maximize yours.',time:'10 min',lessons:4,status:'new'},
+  {id:'assets',icon:'💰',thumb:'thumb-assets',title:'Saving for a Down Payment',desc:'Learn down payment requirements by loan type and strategies for saving faster.',time:'7 min',lessons:3,status:'locked'},
+  {id:'dti',icon:'📊',thumb:'thumb-liabilities',title:'DTI & Budgeting Basics',desc:'Understand debt-to-income ratio and how to position your finances for approval.',time:'9 min',lessons:4,status:'locked'},
+  {id:'process',icon:'🗺️',thumb:'thumb-process',title:'The Home Buying Process',desc:'Step-by-step walkthrough from pre-qualification to closing day.',time:'12 min',lessons:5,status:'locked'},
+  {id:'loans',icon:'📋',thumb:'thumb-income',title:'Loan Programs Explained',desc:'FHA, VA, USDA, Conventional — who qualifies and what might be right for you.',time:'11 min',lessons:4,status:'locked'},
+];
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+// #13 — Mobile hamburger sidebar toggle
+function toggleSidebar(which) {
+  const sb = document.getElementById(which === 'pro' ? 'pro-sb' : 'client-sb');
+  const ov = document.getElementById(which + '-overlay');
+  sb?.classList.toggle('open');
+  ov?.classList.toggle('open');
+}
+
+// ── SHARED SAIL DATA SYNC ──
+function syncSailData() {
+  const totalInc  = sailInputs.income.reduce((a,b)=>a+b,0);
+  const totalLiab = sailInputs.liabilities.reduce((a,b)=>a+b,0);
+  const dti       = totalInc > 0 ? ((totalLiab + sailInputs.housePmt) / totalInc * 100) : 0;
+  sailData.score       = Math.min(100, Math.round(sailInputs.score / 760 * 100));
+  sailData.assets      = Math.min(100, Math.round(sailInputs.savings / (sailInputs.homePrice * 0.085) * 100));
+  sailData.income      = Math.min(100, Math.round(totalInc / 5000 * 100));
+  sailData.liabilities = Math.min(100, Math.round(Math.max(0, (50 - dti) / 50 * 100)));
+  // #11 — persist sailInputs across navigations
+  try { localStorage.setItem('sailInputs', JSON.stringify(sailInputs)); } catch(e) {}
+}
+
+// #11 — restore sailInputs on load
+(function() {
+  try {
+    const saved = localStorage.getItem('sailInputs');
+    if (saved) Object.assign(sailInputs, JSON.parse(saved));
+  } catch(e) {}
+})();
+
+function goTo(dest) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  if (dest === 'login') document.getElementById('screen-login').classList.add('active');
+  else if (dest === 'pro') { document.getElementById('screen-pro').classList.add('active'); pro('dashboard'); }
+  else if (dest === 'client') { document.getElementById('screen-client').classList.add('active'); client('overview'); }
+  else if (dest === 'celebration') document.getElementById('screen-celebration').classList.add('active');
+}
+
+function pro(page) {
+  document.getElementById('pro-sb')?.classList.remove('open');
+  document.getElementById('pro-overlay')?.classList.remove('open');
+  document.querySelectorAll('#pro-sb .sidebar-item').forEach(i => i.classList.remove('active'));
+  const map = {dashboard:0,clients:1,'client-detail':1,thresholds:3,branding:4,'comp-overview':6,'comp-editor':7,'comp-audit':8,settings:9};
+  document.querySelectorAll('#pro-sb .sidebar-item')[map[page]]?.classList.add('active');
+  document.getElementById('pro-content').innerHTML = '<div class="fade-up">' + getProHTML(page) + '</div>';
+}
+
+function client(page) {
+  document.getElementById('client-sb')?.classList.remove('open');
+  document.getElementById('client-overlay')?.classList.remove('open');
+  quizAnswered = false;
+  document.querySelectorAll('#client-sb .sidebar-item').forEach(i => i.classList.remove('active'));
+  const map = {overview:0,ducks:1,learn:2,sail:3,docs:4,milestones:5,advisor:6};
+  document.querySelectorAll('#client-sb .sidebar-item')[map[page]]?.classList.add('active');
+  document.getElementById('client-content').innerHTML = '<div class="fade-up">' + getClientHTML(page) + '</div>';
+  // #5 fix — trigger sail result renders after DOM injection
+  if (page === 'sail') {
+    const renderMap = { S: renderScoreResult, A: renderAssetResult, I: renderIncomeResult, L: renderLiabilityResult };
+    setTimeout(() => renderMap[sailTab] && renderMap[sailTab](), 0);
+  }
+  if (page === 'ducks') {
+    syncSailData();
+    setTimeout(() => { document.querySelectorAll('.sail-meter-fill').forEach(f => { f.style.width = f.dataset.pct + '%'; }); }, 100);
+  }
+}
+
+// #4 — Mark lesson complete, unlock next module
+function markComplete(id) {
+  const m = modules.find(x => x.id === id);
+  if (m) m.status = 'completed';
+  // unlock the next locked module
+  const nextLocked = modules.find(x => x.status === 'locked');
+  if (nextLocked) nextLocked.status = 'new';
+  currentLesson = null;
+  client('learn');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ════════════════════════════════════════
+// DUCK SVG
+// ════════════════════════════════════════
+function duckSVG(met, size) {
+  const s = size||70, c1 = met ? '#FFD700':'#b0bcc8', c2 = met ? '#FF8C00':'#8a95a3';
+  return `<svg width="${s}" height="${s}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="66" rx="32" ry="23" fill="${c1}"/>
+    <circle cx="72" cy="42" r="18" fill="${c1}"/>
+    <circle cx="79" cy="38" r="3" fill="#222"/><circle cx="80" cy="37" r="1" fill="white"/>
+    <ellipse cx="92" cy="44" rx="9" ry="5" fill="${c2}"/>
+    <ellipse cx="45" cy="65" rx="18" ry="10" fill="${c2}" opacity="0.5"/>
+  </svg>`;
+}
+
+function getDuckTransform(pct) {
+  if (pct >= 100) return 'rotate(0deg) translateY(0px)';
+  if (pct >= 75)  return 'rotate(-4deg) translateY(3px)';
+  if (pct >= 50)  return 'rotate(-12deg) translateY(8px)';
+  if (pct >= 25)  return 'rotate(-24deg) translateY(14px)';
+  return 'rotate(-40deg) translateY(22px)';
+}
+function getDuckOpacity(pct) { return Math.max(0.35, pct/100 * 0.65 + 0.35); }
+
+// ════════════════════════════════════════
+// PRO PAGES
+// ════════════════════════════════════════
+function getProHTML(page) {
+  const pages = {
+    dashboard: proDash, clients: proDash, thresholds: proThresholds,
+    branding: proBranding, settings: proSettings,
+    'comp-overview': compOverview, 'comp-editor': compEditor, 'comp-audit': compAudit,
+    'client-detail': proClientDetail,
+  };
+  return (pages[page] || proDash)();
+}
+
+// #10 — Pro client detail view
+function proClientDetail() {
+  const keyNums = [
+    ['Credit Score', '682', 'Grade C'],
+    ['Current Assets', '$28,500', '10.2% of target'],
+    ['Monthly Income', '$5,400', 'Gross'],
+    ['Monthly Liabilities', '$652', 'Excl. housing'],
+    ['Estimated DTI', '41.7%', 'Grade B — target <40%'],
+  ];
+  const docs = [
+    ["Driver's License", true],['Social Security Card', true],
+    ['W-2s (2 years)', true],['Pay Stubs (30 days)', true],
+    ['Bank Statements (2 mo)', false],["Homeowner's Insurance", false],
+  ];
+  return `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+      <button class="btn btn-outline btn-sm" onclick="pro('dashboard')">← Back</button>
+      <h1 style="font-family:'Playfair Display',serif;font-size:24px">Jamie Rodriguez</h1>
+      <span class="s-chip chip-blue">First-time buyer · FHA</span>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--navy),#243a6e);border-radius:18px;padding:28px;color:white;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center">JR</div>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:20px">Jamie Rodriguez</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:3px">Nashville, TN · Goal: 6–12 months · Last active 2h ago</div>
+          <div style="margin-top:8px"><div class="progress-bar" style="width:180px;height:7px"><div class="progress-fill" style="width:72%"></div></div><span style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;display:block">72% Overall Readiness</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        ${[['S','C','var(--amber)'],['A','A','var(--green)'],['I','—','#aaa'],['L','B','var(--blue)']].map(([l,g,c])=>`<div style="text-align:center"><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.1em;margin-bottom:4px">${l}</div><div style="width:40px;height:40px;border-radius:50%;background:white;color:${c};font-size:${g==='—'?'18px':'17px'};font-weight:700;display:flex;align-items:center;justify-content:center">${g}</div></div>`).join('')}
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
+      <div class="card">
+        <div class="card-header"><h2>Key Numbers</h2></div>
+        <div class="card-body" style="padding:14px 20px">
+          ${keyNums.map(([lbl,val,sub])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--light-gray)"><span style="font-size:13px;color:var(--gray)">${lbl}</span><div style="text-align:right"><strong style="font-size:14px">${val}</strong><div style="font-size:11px;color:var(--gray)">${sub}</div></div></div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>Document Status</h2></div>
+        <div class="card-body" style="padding:14px 20px">
+          ${docs.map(([label,done])=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--light-gray)"><span style="font-size:15px">${done?'✅':'⬜'}</span><span style="font-size:13px;color:${done?'var(--navy)':'var(--gray)'};flex:1">${label}</span><span class="s-chip ${done?'chip-green':'chip-amber'}">${done?'Received':'Pending'}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="pro('thresholds')">🎯 Set Thresholds</button>
+      <button class="btn btn-outline">✉️ Message Jamie</button>
+      <button class="btn btn-gold" onclick="openModal('invite-modal')">+ Invite to Assessment</button>
+    </div>`;
+}
+
+function proDash() {
+  return `
+    <div class="page-header"><h1>Good morning, Chris 👋</h1><p>Here's a snapshot of your clients' readiness progress.</p></div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Total Clients</div><div class="stat-value">12</div><div class="stat-sub">3 invited this month</div></div>
+      <div class="stat-card"><div class="stat-label">Ready to Buy</div><div class="stat-value">4</div><span class="s-chip chip-green" style="margin-top:6px">🦆 In A Row</span></div>
+      <div class="stat-card"><div class="stat-label">In Progress</div><div class="stat-value">6</div><span class="s-chip chip-amber" style="margin-top:6px">Improving</span></div>
+      <div class="stat-card"><div class="stat-label">Compliance</div><div class="stat-value">3</div><span class="s-chip chip-red" style="margin-top:6px">Need Review</span></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>Client Roster</h2><button class="btn btn-gold btn-sm" onclick="openModal('invite-modal')">+ Invite Client</button></div>
+      <div class="card-body" style="padding:0">
+        <table class="client-table">
+          <thead><tr><th>Client</th><th>S.A.I.L. Grades</th><th>Ducks In A Row</th><th>Course</th><th>Last Active</th></tr></thead>
+          <tbody>
+            ${proRow('JR','Jamie Rodriguez',68,87,54,71,'B','A','C','B',33,'2h ago',true)}
+            ${proRow('MT','Marcus Taylor',95,92,88,91,'A','A','A','A',100,'Yesterday',false)}
+            ${proRow('SP','Sophia Patel',42,58,71,60,'D','C','B','C',17,'3 days ago',false)}
+            ${proRow('DL','Devon Lewis',35,38,61,45,'D','D','C','D',0,'1 week ago',false)}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function proRow(init,name,sp,ap,ip,lp,sg,ag,ig,lg,course,active,isJamie) {
+  const overall = Math.round((sp+ap+ip+lp)/4);
+  const allMet = sp>=70&&ap>=70&&ip>=70&&lp>=70;
+  const ducks = allMet ? '🦆🦆🦆🦆' : '🦆'.repeat(Math.floor(overall/25)) + '<span style="opacity:.2">🦆</span>'.repeat(4-Math.floor(overall/25));
+  return `<tr style="cursor:pointer" onclick="${isJamie?"pro('client-detail')":''}">
+    <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar">${init}</div><div><strong>${name}</strong>${isJamie?'<div style="font-size:11px;color:var(--blue)">Click to view detail</div>':''}</div></div></td>
+    <td><div class="sail-grades"><div class="grade-pill grade-${sg}">${sg}</div><div class="grade-pill grade-${ag}">${ag}</div><div class="grade-pill grade-${ig}">${ig}</div><div class="grade-pill grade-${lg}">${lg}</div></div></td>
+    <td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:17px">${ducks}</span><span style="font-size:12px;color:var(--gray)">${overall}%</span>${allMet?'<span class="s-chip chip-green">In A Row!</span>':''}</div></td>
+    <td><div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:${course}%"></div></div><span style="font-size:11px;color:var(--gray)">${course}%</span></td>
+    <td style="color:var(--gray);font-size:13px">${active}</td>
+  </tr>`;
+}
+
+function proThresholds() {
+  return `
+    <div class="page-header"><h1>🎯 Set Client Thresholds</h1><p>Define what "Ducks In A Row" means for each client based on their loan program.</p></div>
+    <div class="card">
+      <div class="card-header"><h2>Jamie Rodriguez — First-Time Buyer (FHA)</h2></div>
+      <div class="card-body">
+        <div class="info-box">These thresholds determine when Jamie's ducks are officially "in a row" and she receives the celebration prompt to contact you.</div>
+        ${threshSlider('Credit Score Threshold','score',70,'Current: 68% · FHA is more forgiving than Conventional')}
+        ${threshSlider('Assets Threshold','assets',70,'Current: 87% · Already above threshold!')}
+        ${threshSlider('Income / DTI Threshold','income',70,'Current: 54% · Target: reduce DTI below 40%')}
+        ${threshSlider('Liabilities Threshold','liabilities',70,'Current: 71% · Just above threshold')}
+        <button class="btn btn-primary" style="margin-top:8px">Save Thresholds</button>
+      </div>
+    </div>`;
+}
+
+function threshSlider(label,key,val,note) {
+  return `<div style="margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px"><label class="form-label" style="margin:0">${label}</label><strong>${val}%</strong></div>
+    <input type="range" min="50" max="100" value="${val}" style="width:100%;accent-color:var(--blue)">
+    <div style="font-size:11px;color:var(--gray);margin-top:4px">${note}</div>
+  </div>`;
+}
+
+function proBranding() {
+  return `<div class="page-header"><h1>🎨 My Branding</h1><p>Customize how your portal appears to clients.</p></div>
+    <div style="background:var(--navy);border-radius:14px;padding:20px 24px;color:white;display:flex;align-items:center;gap:16px;margin-bottom:20px">
+      <div style="width:52px;height:52px;border-radius:10px;background:var(--gold);color:var(--navy);font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center">CB</div>
+      <div><strong style="font-size:18px;font-family:'Playfair Display',serif">Chris Basham</strong><p style="color:rgba(255,255,255,.65);font-size:13px">Loan Originator · Premier Mortgage Group · NMLS 1929240</p></div>
+    </div>
+    <div class="card"><div class="card-header"><h2>Profile Details</h2></div><div class="card-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First Name</label><input class="form-input" value="Chris"/></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input class="form-input" value="Basham"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Title</label><input class="form-input" value="Loan Originator"/></div>
+      <div class="form-group"><label class="form-label">Company</label><input class="form-input" value="Premier Mortgage Group"/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Phone</label><input class="form-input" value="615-994-0112"/></div>
+        <div class="form-group"><label class="form-label">NMLS #</label><input class="form-input" value="1929240"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Website</label><input class="form-input" value="chrisbashammortgage.com"/></div>
+      <button class="btn btn-primary">Save Changes</button>
+    </div></div>`;
+}
+
+function proSettings() {
+  return `<div class="page-header"><h1>⚙️ Settings</h1></div>
+    <div class="card"><div class="card-header"><h2>Subscription</h2></div><div class="card-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--light-gray)">
+        <div><strong style="font-size:15px">Professional Plan</strong><p style="font-size:13px;color:var(--gray);margin-top:4px">Up to 25 clients · Full branding · Duck progress · Learning center · Compliance tools</p></div>
+        <span class="s-chip chip-green">Active</span>
+      </div>
+      <div style="padding-top:14px;font-size:14px;color:var(--gray)">Next billing: <strong style="color:var(--navy)">April 11, 2026 · $49/mo</strong></div>
+      <div style="margin-top:14px;display:flex;gap:10px"><button class="btn btn-outline btn-sm">Manage Billing</button><button class="btn btn-outline btn-sm">Upgrade Plan</button></div>
+    </div></div>`;
+}
+
+// ── COMPLIANCE PRO PAGES ──
+function compOverview() {
+  const needsAction = complianceItems.filter(i => i.status !== 'approved').length;
+  const approved = complianceItems.filter(i => i.status === 'approved').length;
+  const highRisk = complianceItems.filter(i => i.risk === 'high').length;
+  return `
+    <div class="page-header"><h1>🛡️ Compliance Overview</h1><p>Manage all regulated content — Regulation N (MAP Rule) and Regulation Z (TILA).</p></div>
+    <div class="callout callout-both">⚖️ <span><strong>Your Responsibility:</strong> As a licensed mortgage professional, all content displayed to clients must comply with Regulation N (12 CFR Part 1014) and Regulation Z (12 CFR Part 1026.24). Civil penalties can reach <strong>$16,000 per day per violation</strong>. All edits are logged for 24 months.</span></div>
+    <div class="stats-row">
+      <div class="comp-stat danger"><div class="comp-stat-label">Needs Action</div><div class="comp-stat-value">${needsAction}</div><div class="comp-stat-sub">items require review</div></div>
+      <div class="comp-stat warning"><div class="comp-stat-label">High Risk</div><div class="comp-stat-value">${highRisk}</div><div class="comp-stat-sub">Reg N + Reg Z exposure</div></div>
+      <div class="comp-stat success"><div class="comp-stat-label">Approved</div><div class="comp-stat-value">${approved}</div><div class="comp-stat-sub">reviewed & logged</div></div>
+      <div class="comp-stat info"><div class="comp-stat-label">Retention</div><div class="comp-stat-value">24mo</div><div class="comp-stat-sub">Reg N requirement</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>⚠️ Items Needing Attention</h2><button class="btn btn-gold btn-sm" onclick="pro('comp-editor')">Review All →</button></div>
+      <div class="card-body" style="padding:0">
+        ${complianceItems.filter(i=>i.status!=='approved').map(compRow).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>✅ Recently Approved</h2></div>
+      <div class="card-body" style="padding:0">
+        ${complianceItems.filter(i=>i.status==='approved').slice(0,4).map(compRow).join('')}
+      </div>
+    </div>`;
+}
+
+function compRow(item) {
+  const regBadges = item.regs.map(r=>`<span class="comp-badge ${r}">${r==='reg-n'?'Reg N':'Reg Z'}</span>`).join('');
+  const safeBadge = item.regs.length===0?`<span class="comp-badge reg-safe">✓ Safe</span>`:'';
+  const scMap = {approved:'sc-approved','needs-review':'sc-review',draft:'sc-draft'};
+  const scLbl = {approved:'✓ Approved','needs-review':'⚠ Needs Review',draft:'◦ Draft'};
+  return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--light-gray);flex-wrap:wrap">
+    <span class="risk-ind risk-${item.risk}">${item.risk.charAt(0).toUpperCase()+item.risk.slice(1)}</span>
+    <div style="flex:1;min-width:160px"><div style="font-size:13px;font-weight:600">${item.title}</div><div style="font-size:11px;color:var(--gray);margin-top:2px">${item.location}</div></div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap">${regBadges}${safeBadge}</div>
+    <span class="status-chip ${scMap[item.status]}">${scLbl[item.status]}</span>
+    <button class="btn btn-outline btn-xs" onclick="openEdit('${item.id}')">Edit</button>
+  </div>`;
+}
+
+function compEditor() {
+  return `
+    <div class="page-header"><h1>✏️ Regulated Content Editor</h1><p>Review, edit, and approve all content that falls under Regulation N or Regulation Z before it is shown to clients.</p></div>
+    ${['high','medium','low'].map(risk => {
+      const items = complianceItems.filter(i=>i.risk===risk);
+      const lbl = {high:'🔴 High Risk — Reg N + Reg Z',medium:'🟡 Medium Risk — Reg N',low:'🟢 Low Risk — Educational'};
+      return `<div class="card"><div class="card-header"><h2>${lbl[risk]}</h2></div><div class="card-body" style="padding:8px 12px">
+        ${items.map(item => {
+          const rBadges = item.regs.map(r=>`<span class="comp-badge ${r}">${r==='reg-n'?'Reg N':'Reg Z'}</span>`).join(' ');
+          const safe = item.regs.length===0?`<span class="comp-badge reg-safe">✓ Safe</span>`:'';
+          const scMap={approved:'sc-approved','needs-review':'sc-review',draft:'sc-draft'};
+          const scLbl={approved:'✓ Approved','needs-review':'⚠ Needs Review',draft:'◦ Draft'};
+          return `<div class="comp-field risk-${item.risk}" style="margin:10px 0">
+            <div class="comp-field-header">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span class="risk-ind risk-${item.risk}">${item.risk.charAt(0).toUpperCase()+item.risk.slice(1)}</span>
+                <strong style="font-size:13px">${item.title}</strong>
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">${rBadges}${safe}<span class="status-chip ${scMap[item.status]}">${scLbl[item.status]}</span></div>
+            </div>
+            <div class="comp-field-body">
+              <div style="font-size:11px;color:var(--gray);margin-bottom:6px">📍 ${item.location}</div>
+              <div class="comp-field-value ${item.status==='needs-review'?'needs-review':''}"><div style="font-size:13px;white-space:pre-line;line-height:1.6">${item.currentValue}</div></div>
+              ${item.disclaimer?`<div class="comp-field-disclaimer"><span>⚖️</span><span><strong>Disclaimer:</strong> ${item.disclaimer.substring(0,100)}...</span></div>`:`<div class="comp-field-disclaimer"><span>✅</span><span>No disclaimer required.</span></div>`}
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:8px">
+                <span style="font-size:11px;color:var(--gray)">Reviewed: ${item.lastReviewed} by ${item.reviewedBy}</span>
+                <button class="btn btn-outline btn-sm" onclick="openEdit('${item.id}')">✏️ Edit & Approve</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div></div>`;
+    }).join('')}`;
+}
+
+function compAudit() {
+  const sStyle = {approved:'color:var(--green);font-weight:600',flagged:'color:var(--red);font-weight:600',draft:'color:var(--blue)'};
+  return `
+    <div class="page-header"><h1>🗂️ Compliance Audit Log</h1><p>24-month retention log of all regulated content reviews, as required by Regulation N (12 CFR Part 1014).</p></div>
+    <div class="callout callout-n">📌 <span><strong>Reg N Recordkeeping:</strong> All materially different commercial communications must be retained for a minimum of <strong>24 months</strong> from date of last use (12 CFR §1014.5). This log satisfies that requirement.</span></div>
+    <div class="card">
+      <div class="card-header"><h2>Activity Log</h2><button class="btn btn-gold btn-sm">Export CSV</button></div>
+      <div class="card-body" style="padding:0">
+        <div class="audit-row hdr"><span>Timestamp</span><span>User</span><span>Action</span><span>Status</span></div>
+        ${auditLog.map(e=>`<div class="audit-row"><span style="color:var(--gray)">${e.ts}</span><span>${e.user}</span><span>${e.action}</span><span style="${sStyle[e.status]||''}">${e.status.charAt(0).toUpperCase()+e.status.slice(1)}</span></div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// CLIENT PAGES
+// ════════════════════════════════════════
+function getClientHTML(page) {
+  const pages = {overview:clientOverview,ducks:clientDucks,learn:clientLearn,sail:clientSail,docs:clientDocs,milestones:clientMilestones,advisor:clientAdvisor};
+  return (pages[page]||clientOverview)();
+}
+
+function clientOverview() {
+  // #7 — calculate grades live from sailInputs
+  syncSailData();
+  const totalInc  = sailInputs.income.reduce((a,b)=>a+b,0);
+  const totalLiab = sailInputs.liabilities.reduce((a,b)=>a+b,0);
+  const dti       = totalInc > 0 ? ((totalLiab + sailInputs.housePmt) / totalInc * 100) : 0;
+  const grades = {
+    S: scoreGrade(sailInputs.score),
+    A: assetGrade(sailInputs.savings, sailInputs.homePrice),
+    I: '—',
+    L: dtiGrade(dti),
+  };
+  const gc = {A:'#27ae60',B:'#2453a0',C:'#f39c12',D:'#e67e22',N:'#e74c3c'};
+  const overall = Math.round(Object.values(sailData).reduce((a,b)=>a+b,0)/4);
+  const completed = modules.filter(m=>m.status==='completed').length;
+  const coursePct = Math.round(completed/modules.length*100);
+
+  return `
+    <div style="background:linear-gradient(135deg,var(--navy),#243a6e);border-radius:18px;padding:28px;color:white;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="width:60px;height:60px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center">JR</div>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:22px">Jamie Rodriguez</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:4px">Goal: Nashville, TN · 6–12 months</div>
+          <div style="margin-top:8px"><div class="progress-bar" style="width:200px;height:8px"><div class="progress-fill" style="width:${overall}%"></div></div><span style="font-size:12px;color:rgba(255,255,255,.6);margin-top:4px;display:block">${overall}% Overall Readiness</span></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        ${[['S','Score'],['A','Assets'],['I','Income'],['L','Liabilities']].map(([k,word])=>`
+          <div style="text-align:center">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.1em;margin-bottom:4px">${k}</div>
+            <div style="width:44px;height:44px;border-radius:50%;background:white;color:${grades[k]==='—'?'#aaa':gc[grades[k]]};font-size:${grades[k]==='—'?'22px':'18px'};font-weight:700;display:flex;align-items:center;justify-content:center" title="${word}">${grades[k]}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <div class="card" style="cursor:pointer;transition:all .2s" onclick="client('ducks')" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        <div class="card-body" style="text-align:center;padding:24px">
+          <div style="font-size:44px;margin-bottom:8px">🦆🦆🦆🦆</div>
+          <h3 style="font-size:15px;margin-bottom:4px">My Ducks In A Row</h3>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:12px">Track your readiness visually</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:${overall}%"></div></div>
+          <p style="font-size:12px;color:var(--gray);margin-top:6px">${overall}% complete</p>
+        </div>
+      </div>
+      <div class="card" style="cursor:pointer;transition:all .2s" onclick="client('learn')" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        <div class="card-body" style="text-align:center;padding:24px">
+          <div style="font-size:44px;margin-bottom:8px">🎓</div>
+          <h3 style="font-size:15px;margin-bottom:4px">Continue Learning</h3>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:12px">${completed} of ${modules.length} modules complete</p>
+          <div class="progress-bar"><div class="progress-fill" style="width:${coursePct}%"></div></div>
+          <p style="font-size:12px;color:var(--gray);margin-top:6px">${coursePct}% of course complete</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>🎯 Next Steps</h2></div>
+      <div class="card-body">
+        ${nextStep('📚','Complete "Understanding Your Credit Score" lesson','High',"client('learn')")}
+        ${nextStep('💳','Reduce credit card balance below 30% utilization','High','')}
+        ${nextStep('📄','Upload last 2 months of bank statements','Medium',"client('docs')")}
+      </div>
+    </div>`;
+}
+
+function nextStep(icon,text,priority,onclick) {
+  const c={High:'chip-red',Medium:'chip-amber',Low:'chip-blue'};
+  return `<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--off-white);border-radius:8px;margin-bottom:8px;cursor:${onclick?'pointer':''}" ${onclick?`onclick="${onclick}"`:''}><span style="font-size:18px">${icon}</span><p style="font-size:13px;color:var(--navy);flex:1">${text}</p><span class="s-chip ${c[priority]}">${priority}</span></div>`;
+}
+
+function clientDucks() {
+  // #8 — sync sailData from sailInputs, no separate sliders
+  syncSailData();
+  const totalInc  = sailInputs.income.reduce((a,b)=>a+b,0);
+  const totalLiab = sailInputs.liabilities.reduce((a,b)=>a+b,0);
+  const dti       = totalInc > 0 ? ((totalLiab + sailInputs.housePmt) / totalInc * 100) : 0;
+
+  const overall = Math.round(Object.values(sailData).reduce((a,b)=>a+b,0)/4);
+  const allMet = Object.keys(sailData).every(k=>sailData[k]>=thresholds[k]);
+  const keys = ['score','assets','income','liabilities'];
+  const labels = {score:'S — Score',assets:'A — Assets',income:'I — Income',liabilities:'L — Liabilities'};
+  const fills = {score:'fill-score',assets:'fill-assets',income:'fill-income',liabilities:'fill-liabilities'};
+
+  let ducksHTML = keys.map((k,i) => {
+    const pct = sailData[k], met = pct>=thresholds[k];
+    const transform = getDuckTransform(pct);
+    const opacity = getDuckOpacity(pct);
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;transition:all 1.2s cubic-bezier(.34,1.56,.64,1);transition-delay:${i*.15}s">
+      <div class="duck-pct ${met?'met':''}">${pct}%${met?' ✓':''}</div>
+      <div style="transform:${transform};opacity:${opacity};transition:all 1s ease;filter:drop-shadow(0 4px ${met?'12px rgba(255,215,0,.5)':'6px rgba(0,0,0,.3)'})">
+        ${duckSVG(met, 72)}
+      </div>
+      <div class="duck-label">${k.toUpperCase()}</div>
+    </div>`;
+  }).join('');
+
+  let metersHTML = keys.map(k => {
+    const pct = sailData[k], met = pct>=thresholds[k];
+    return `<div class="sail-meter">
+      <div class="sail-meter-top">
+        <span class="sail-meter-lbl">${labels[k]}</span>
+        <span class="sail-meter-pct ${met?'met':''}">${pct}%${met?' ✓':''}</span>
+      </div>
+      <div class="sail-meter-bar"><div class="sail-meter-fill ${fills[k]}" data-pct="${pct}" style="width:0%"></div></div>
+      <div class="sail-meter-thresh">Threshold: ${thresholds[k]}%</div>
+    </div>`;
+  }).join('');
+
+  // #8 — source labels from sailInputs so context is clear
+  const sourceLabels = {
+    score: `Credit Score: ${sailInputs.score}`,
+    assets: `Savings: ${fmt(sailInputs.savings)} of ${fmt(sailInputs.homePrice)} target`,
+    income: `Gross Income: ${fmt(totalInc)}/mo`,
+    liabilities: `DTI: ${dti.toFixed(1)}% (${fmt(totalLiab + sailInputs.housePmt)} expenses)`,
+  };
+
+  const sourceCardsHTML = keys.map(k => {
+    const pct = sailData[k], met = pct >= thresholds[k];
+    return `<div style="background:rgba(255,255,255,.07);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <span style="font-size:12px;color:rgba(255,255,255,.65)">${sourceLabels[k]}</span>
+      <span style="font-size:13px;font-weight:700;color:${met?'var(--gold)':'rgba(255,255,255,.5)'}">→ ${pct}%${met?' ✓':''}</span>
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="page-header"><h1>🦆 My Ducks In A Row</h1><p>Your S.A.I.L. Assessment values drive the ducks. Update your scores in the assessment to see them move.</p></div>
+    <div class="duck-hero">
+      <div class="duck-hero-title">Overall Readiness</div>
+      <div class="duck-hero-heading">${allMet?'🎉 Your Ducks Are In A Row!':overall+'% of the way there — keep going!'}</div>
+      <div class="duck-row-visual">${ducksHTML}</div>
+      <div class="sail-meters">${metersHTML}</div>
+      ${allMet?`<div style="margin-top:20px;text-align:center"><button class="btn btn-gold" onclick="goTo('celebration')" style="font-size:16px;padding:14px 32px">🎉 See Your Achievement →</button></div>`:''}
+    </div>
+    <div class="card">
+      <div class="card-header"><h2>📊 How Your Scores Map to Progress</h2><button class="btn btn-outline btn-sm" onclick="client('sail')">Update in S.A.I.L. →</button></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+        ${sourceCardsHTML}
+        <p style="font-size:12px;color:var(--gray);margin-top:6px">Progress percentages are calculated from your S.A.I.L. Assessment inputs relative to your advisor's thresholds. <span style="color:var(--blue);cursor:pointer" onclick="client('sail')">Update your assessment →</span></p>
+      </div>
+    </div>`;
+}
+
+function clientLearn() {
+  if (currentLesson) return lessonView(currentLesson);
+  const completed = modules.filter(m=>m.status==='completed').length;
+  const pct = Math.round(completed/modules.length*100);
+  const offset = Math.round(220-(220*pct/100));
+
+  return `
+    <div class="page-header"><h1>🎓 Learning Center</h1><p>Build your homebuying knowledge one module at a time.</p></div>
+    <div style="background:linear-gradient(135deg,var(--navy),#243a6e);border-radius:18px;padding:28px;margin-bottom:24px;color:white;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:11px;color:rgba(255,255,255,.6);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Get Your Ducks In A Row</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px">Homebuyer Readiness Course</h2>
+        <p style="font-size:13px;color:rgba(255,255,255,.7)">${completed} of ${modules.length} modules complete · Earn your badge on completion</p>
+      </div>
+      <div style="position:relative;width:76px;height:76px;flex-shrink:0">
+        <svg viewBox="0 0 80 80" width="76" height="76" style="transform:rotate(-90deg)">
+          <circle cx="40" cy="40" r="35" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="6"/>
+          <circle cx="40" cy="40" r="35" fill="none" stroke="var(--gold)" stroke-width="6" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="${offset}" style="transition:stroke-dashoffset 1s ease"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--gold)">${pct}%</div>
+      </div>
+    </div>
+    <div class="module-grid">
+      ${modules.map((m,idx) => {
+        const prevDone = idx === 0 || modules[idx-1].status === 'completed';
+        const badge = m.status==='completed'?`<div class="module-badge mbadge-done">✓ Done</div>`:m.status==='new'?`<div class="module-badge mbadge-new">▶ Start</div>`:`<div class="module-badge mbadge-locked">🔒</div>`;
+        const clickable = m.status!=='locked';
+        const unlockNote = m.status==='locked' ? `<div style="font-size:11px;color:var(--amber);margin-top:4px">🔒 Complete "${modules[idx-1]?.title}" to unlock</div>` : '';
+        return `<div class="module-card ${m.status==='locked'?'locked':''} ${m.status==='completed'?'completed':''}" ${clickable?`onclick="currentLesson='${m.id}';client('learn')"`:''}>
+          <div class="module-thumb ${m.thumb}">${m.icon}${badge}</div>
+          <div class="module-info">
+            <h3>${m.title}</h3><p>${m.desc}</p>
+            <div class="module-meta"><span>⏱ ${m.time}</span><span>📖 ${m.lessons} lessons</span>${m.status==='completed'?'<span style="color:var(--green);font-weight:600">✓ Done</span>':''}</div>
+            ${unlockNote}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function lessonView(id) {
+  const m = modules.find(x=>x.id===id);
+  const content = id==='credit'?creditLesson():id==='mortgage'?mortgageLesson():'<div class="lesson-body"><h2>Coming Soon</h2></div>';
+  return `<div class="lesson-container">
+    <button class="lesson-back" onclick="currentLesson=null;client('learn')">← Back to Courses</button>
+    <div class="lesson-banner ${m.thumb}">${m.icon}</div>
+    ${content}
+  </div>`;
+}
+
+function creditLesson() {
+  return `<div class="lesson-body">
+    <h2>Understanding Your Credit Score</h2>
+    <p>Your credit score is one of the most powerful numbers in your financial life. It plays a huge role in whether you get approved for a mortgage and at what interest rate.</p>
+    <div class="video-placeholder"><div class="play-btn">▶</div><div class="video-lbl">Watch: Credit Scores Explained (4 min)</div><div class="video-sub">Video by Chris Basham · Premier Mortgage Group</div></div>
+    <h3>How Your Score Is Calculated</h3>
+    <p>Your FICO score is made up of five components. Understanding each one helps you know exactly where to focus.</p>
+    <ul>
+      <li><strong>Payment History (35%)</strong> — The single biggest factor. Every on-time payment helps. Every late payment hurts — including rent and utilities.</li>
+      <li><strong>Credit Utilization (30%)</strong> — How much of your available credit you're using. Keep each card under 30%.</li>
+      <li><strong>Length of Credit History (15%)</strong> — Older accounts are more valuable. Never close a card you've had for years.</li>
+      <li><strong>Credit Mix (10%)</strong> — Having a mix of credit types shows lenders you can manage different kinds of debt.</li>
+      <li><strong>New Credit (10%)</strong> — Every new application is a hard inquiry. Don't apply for new cards before buying a home.</li>
+    </ul>
+    <div class="lesson-hl"><p><strong>The S.A.I.L. Grading Scale:</strong><br>A = 760+ · B = 700–759 · C = 620–699 · D = 580–619 · N = 579 or less<br><br>Your lender pulls all 3 bureau scores and uses the <strong>middle score</strong>.</p></div>
+    <div class="pro-tip"><div class="pro-tip-icon">💡</div><div class="pro-tip-content"><strong>Chris's Tip for Middle Tennessee Buyers</strong><p>I see buyers in the 650–690 range who could unlock much better programs with just 60–90 days of focused credit work. Paying down one card below 30% utilization can move your score 20–30 points — the difference between a C and B grade, and thousands of dollars in savings over the life of your loan.</p></div></div>
+  </div>
+  <div class="quiz-section">
+    <h3>🧠 Quick Check</h3>
+    <div class="quiz-q">Which factor makes up the largest portion of your credit score?</div>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQuiz(this,false,'Close — utilization is 30%, but not the top factor.')">Credit Utilization (30%)</button>
+      <button class="quiz-opt" onclick="answerQuiz(this,true,'Correct! Payment history is 35% — paying every bill on time is the single most impactful habit.')">Payment History (35%)</button>
+      <button class="quiz-opt" onclick="answerQuiz(this,false,'Credit mix is only about 10% of your score.')">Credit Mix (10%)</button>
+      <button class="quiz-opt" onclick="answerQuiz(this,false,'Length of history is 15% — important, but not the biggest factor.')">Length of Credit History (15%)</button>
+    </div>
+    <div class="quiz-feedback" id="quiz-fb"></div>
+  </div>
+  <div class="lesson-nav">
+    <button class="btn btn-outline" onclick="currentLesson=null;client('learn')">← Back to Courses</button>
+    <button class="btn btn-green" onclick="markComplete('credit')">✓ Mark Complete</button>
+  </div>`;
+}
+
+function mortgageLesson() {
+  return `<div class="lesson-body">
+    <h2>What Is a Mortgage?</h2>
+    <p>A mortgage is a loan used to purchase a home, where the home itself serves as collateral. Understanding how it works — and what lenders look for — demystifies the entire homebuying process.</p>
+    <div class="video-placeholder"><div class="play-btn">▶</div><div class="video-lbl">Watch: How Mortgages Work (5 min)</div><div class="video-sub">Video by Chris Basham · Premier Mortgage Group</div></div>
+    <h3>The S.A.I.L. Framework</h3>
+    <p>Every mortgage lender evaluates you across four core dimensions — what we call S.A.I.L.</p>
+    <div class="lesson-hl"><p><strong>S — Score (Credit)</strong> · Your credit score determines eligibility, rate, and insurance cost.<br><br><strong>A — Assets</strong> · Your savings cover the down payment, closing costs, and reserves.<br><br><strong>I — Income</strong> · Your gross income determines how much house you can afford.<br><br><strong>L — Liabilities</strong> · Your existing debts reduce how much income is available for a mortgage.</p></div>
+    <div class="pro-tip"><div class="pro-tip-icon">💡</div><div class="pro-tip-content"><strong>Chris's Note</strong><p>Most people think they need a perfect score and 20% down. The truth is there are programs — FHA at 3.5%, VA at 0%, USDA at 0% — that make homeownership very achievable. My job is to find the right program for YOUR situation.</p></div></div>
+  </div>
+  <div class="lesson-nav">
+    <button class="btn btn-outline" onclick="currentLesson=null;client('learn')">← Back to Courses</button>
+    <button class="btn btn-green" onclick="markComplete('mortgage')">✓ Mark Complete</button>
+  </div>`;
+}
+
+function answerQuiz(btn, correct, feedback) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  btn.classList.add(correct?'correct':'wrong');
+  const fb = document.getElementById('quiz-fb');
+  if (fb) { fb.className='quiz-feedback show '+(correct?'correct':'wrong'); fb.textContent=(correct?'✓ ':'✗ ')+feedback; }
+}
+
+// ── CLIENT SAIL ──
+let sailTab = 'S';
+
+function switchSailTab(tab) {
+  sailTab = tab;
+  document.getElementById('client-content').innerHTML = '<div class="fade-up">' + clientSail() + '</div>';
+  // #5 fix — render result boxes after DOM is ready
+  const renderMap = { S: renderScoreResult, A: renderAssetResult, I: renderIncomeResult, L: renderLiabilityResult };
+  setTimeout(() => renderMap[tab] && renderMap[tab](), 0);
+}
+
+function clientSail(tab) {
+  if (tab) sailTab = tab;
+  const totalInc  = sailInputs.income.reduce((a,b)=>a+b,0);
+  const totalLiab = sailInputs.liabilities.reduce((a,b)=>a+b,0);
+  const dti       = totalInc > 0 ? ((totalLiab + sailInputs.housePmt) / totalInc * 100) : 0;
+  const sGrade    = scoreGrade(sailInputs.score);
+  const aGrade    = assetGrade(sailInputs.savings, sailInputs.homePrice);
+  const lGrade    = dtiGrade(dti);
+  // Income has no standalone grade — it feeds DTI in the L tab
+  const tabs = [
+    { key:'S', word:'Score',       grade: sGrade,  noGrade: false, pct: Math.min(100, Math.round(sailInputs.score/760*100)) },
+    { key:'A', word:'Assets',      grade: aGrade,  noGrade: false, pct: Math.min(100, Math.round(sailInputs.savings/(sailInputs.homePrice*0.085)*100)) },
+    { key:'I', word:'Income',      grade: '—',     noGrade: true,  pct: Math.min(100, Math.round(totalInc/5000*100)) },
+    { key:'L', word:'Liabilities', grade: lGrade,  noGrade: false, pct: Math.min(100, Math.round(Math.max(0,(50-dti)/50*100))) },
+  ];
+  const gradeColors = { A:'var(--green)', B:'var(--blue)', C:'var(--amber)', D:'#e67e22', N:'var(--red)' };
+  const active = tabs.find(t => t.key === sailTab);
+
+  const tabsHTML = tabs.map(t => {
+    const isActive = t.key === sailTab;
+    const gc = gradeColors[t.grade];
+    return `
+      <div onclick="switchSailTab('${t.key}')" style="
+        flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+        padding:16px 8px 14px; cursor:pointer; position:relative; transition:all .2s;
+        background:${isActive ? 'white' : 'transparent'};
+        border-radius:${isActive ? '12px 12px 0 0' : '12px 12px 0 0'};
+        border-bottom:${isActive ? '3px solid var(--navy)' : '3px solid transparent'};
+        margin-bottom:${isActive ? '-3px' : '0'};
+      ">
+        <div style="
+          font-family:'Playfair Display',serif;
+          font-size:clamp(28px,5vw,48px);
+          font-weight:800;
+          line-height:1;
+          color:${isActive ? 'var(--navy)' : 'rgba(255,255,255,0.45)'};
+          letter-spacing:-1px;
+          transition:all .2s;
+        ">${t.key}</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px;color:${isActive?'var(--gray)':'rgba(255,255,255,0.35)'};">${t.word}</div>
+        <div class="sail-tab-grade" data-key="${t.key}" style="
+          width:28px;height:28px;border-radius:50%;
+          background:${t.noGrade ? 'rgba(255,255,255,0.15)' : isActive ? gradeColor[t.grade] : 'rgba(255,255,255,0.15)'};
+          color:${t.noGrade ? 'rgba(255,255,255,0.4)' : 'white'};
+          font-size:${t.noGrade ? '16px' : '12px'};font-weight:700;
+          display:flex;align-items:center;justify-content:center;
+          margin-top:6px; transition:all .2s;
+        ">${t.grade}</div>
+      </div>`;
+  }).join('');
+
+  const contentMap = {
+    S: sailScoreContent,
+    A: sailAssetsContent,
+    I: sailIncomeContent,
+    L: sailLiabilitiesContent,
+  };
+
+  const summaryHTML = `
+    <div style="background:linear-gradient(135deg,var(--navy),#243a6e);border-radius:0 0 16px 16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        ${tabs.map(t=>`<div style="text-align:center">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.1em;margin-bottom:4px">${t.key}</div>
+          <div class="sail-summary-grade" data-key="${t.key}" style="width:36px;height:36px;border-radius:50%;background:${t.noGrade?'rgba(255,255,255,0.12)':t.key===sailTab?gradeColors[t.grade]:'rgba(255,255,255,0.15)'};color:${t.noGrade?'rgba(255,255,255,0.35)':'white'};font-size:${t.noGrade?'18px':'16px'};font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid ${t.noGrade?'transparent':t.key===sailTab?gradeColors[t.grade]:'transparent'}">${t.grade}</div>
+          <div style="margin-top:4px"><div class="progress-bar" style="width:36px;height:4px"><div class="progress-fill" style="width:${t.pct}%"></div></div></div>
+        </div>`).join('')}
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="client('ducks')">🦆 View My Ducks →</button>
+    </div>`;
+
+  return `
+    <div class="page-header">
+      <h1>⛵ S.A.I.L. Assessment</h1>
+      <p>Click each letter to assess your readiness across all four areas.</p>
+    </div>
+
+    <!-- TAB BAR -->
+    <div style="background:linear-gradient(135deg,var(--navy),#1e3a70);border-radius:16px 16px 0 0;padding:20px 20px 0;">
+      <div style="display:flex;gap:4px;">
+        ${tabsHTML}
+      </div>
+    </div>
+
+    <!-- TAB CONTENT -->
+    <div class="card" style="border-radius:0;margin-bottom:0;box-shadow:none;border-left:1px solid var(--light-gray);border-right:1px solid var(--light-gray);">
+      <div class="card-body">
+        ${contentMap[sailTab]()}
+      </div>
+    </div>
+
+    <!-- SUMMARY BAR -->
+    ${summaryHTML}
+    <div style="height:20px"></div>`;
+}
+
+// ── SAIL STATE (persists across tab switches) ──
+const sailInputs = {
+  score: 682,
+  savings: 28500,
+  homePrice: 280000,
+  income: [4800, 600, 0, 0],
+  liabilities: [387, 220, 45, 0, 0],
+  housePmt: 1600,
+};
+
+// ── GRADE HELPERS ──
+function scoreGrade(s) {
+  if (s >= 760) return 'A';
+  if (s >= 700) return 'B';
+  if (s >= 620) return 'C';
+  if (s >= 580) return 'D';
+  return 'N';
+}
+function assetGrade(savings, homePrice) {
+  const downPmt  = homePrice * 0.05;
+  const closing  = homePrice * 0.035;
+  const needed   = downPmt + closing;
+  const reserves = savings - needed;
+  const pct      = savings / homePrice;
+  if (pct >= 0.235 && reserves > 0) return 'A';   // 20%dp + 3.5% closing + reserves
+  if (pct >= 0.065 && reserves >= 0) return 'B';  // 3–15% dp + closing + some reserves
+  if (pct >= 0.065) return 'C';                   // covers dp + closing, no reserves
+  if (pct >= 0.035) return 'D';                   // covers closing OR dp only
+  return 'N';
+}
+function dtiGrade(dti) {
+  if (dti <= 36) return 'A';
+  if (dti <= 40) return 'B';
+  if (dti <= 44) return 'C';
+  if (dti <= 50) return 'D';
+  return 'N';
+}
+const gradeColor = { A:'var(--green)', B:'var(--blue)', C:'var(--amber)', D:'#e67e22', N:'var(--red)' };
+const gradeChip  = { A:'chip-green', B:'chip-blue', C:'chip-amber', D:'chip-amber', N:'chip-red' };
+function gradeBg(g) {
+  return { A:'var(--green-light)', B:'var(--blue-light)', C:'var(--amber-light)', D:'#fff0e0', N:'var(--red-light)' }[g];
+}
+function fmt(n) { return '$' + Math.round(n).toLocaleString(); }
+
+// #1 fix — refresh the grade circles on the tab bar without full re-render
+function refreshTabGrades() {
+  const totalInc  = sailInputs.income.reduce((a,b)=>a+b,0);
+  const totalLiab = sailInputs.liabilities.reduce((a,b)=>a+b,0);
+  const dti       = totalInc > 0 ? ((totalLiab + sailInputs.housePmt) / totalInc * 100) : 0;
+  const grades = {
+    S: scoreGrade(sailInputs.score),
+    A: assetGrade(sailInputs.savings, sailInputs.homePrice),
+    // I intentionally omitted — no standalone grade, feeds DTI in L tab
+    L: dtiGrade(dti),
+  };
+  document.querySelectorAll('.sail-tab-grade').forEach(el => {
+    const key = el.dataset.key;
+    if (!grades[key]) return; // skip I tab
+    const g = grades[key];
+    el.textContent = g;
+    el.style.background = gradeColor[g];
+    el.style.color = 'white';
+    el.style.fontSize = '12px';
+  });
+}
+
+// #12 — refresh summary bar grades at bottom of SAIL assessment
+function refreshSummaryBar() {
+  syncSailData();
+  const totalInc  = sailInputs.income.reduce((a,b)=>a+b,0);
+  const totalLiab = sailInputs.liabilities.reduce((a,b)=>a+b,0);
+  const dti       = totalInc > 0 ? ((totalLiab + sailInputs.housePmt) / totalInc * 100) : 0;
+  const grades = {
+    S: scoreGrade(sailInputs.score),
+    A: assetGrade(sailInputs.savings, sailInputs.homePrice),
+    I: '—',
+    L: dtiGrade(dti),
+  };
+  const gc = {A:'var(--green)',B:'var(--blue)',C:'var(--amber)',D:'#e67e22',N:'var(--red)'};
+  document.querySelectorAll('.sail-summary-grade').forEach(el => {
+    const key = el.dataset.key;
+    if (!grades[key]) return;
+    const g = grades[key];
+    el.textContent = g;
+    if (g !== '—') {
+      el.style.background = gc[g];
+      el.style.color = 'white';
+    }
+  });
+}
+
+// ── LIVE UPDATE FUNCTIONS (called by oninput) ──
+function updateScore(val) {
+  sailInputs.score = parseInt(val) || 0;
+  renderScoreResult();
+  refreshTabGrades();
+  refreshSummaryBar();
+}
+function updateSavings(val) {
+  sailInputs.savings = parseFloat(val) || 0;
+  renderAssetResult();
+  refreshTabGrades();
+  refreshSummaryBar();
+}
+function updateHomePrice(val) {
+  sailInputs.homePrice = parseFloat(val) || 0;
+  renderAssetResult();
+  refreshTabGrades();
+  refreshSummaryBar();
+}
+function updateIncome(idx, val) {
+  sailInputs.income[idx] = parseFloat(val) || 0;
+  renderIncomeResult();
+  refreshTabGrades();
+  refreshSummaryBar();
+}
+function updateLiability(idx, val) {
+  sailInputs.liabilities[idx] = parseFloat(val) || 0;
+  renderLiabilityResult();
+  refreshTabGrades();
+  refreshSummaryBar();
+}
+function updateHousePmt(val) {
+  sailInputs.housePmt = parseFloat(val) || 0;
+  renderLiabilityResult();
+  refreshTabGrades();
+  refreshSummaryBar();
+}
+
+function renderScoreResult() {
+  const el = document.getElementById('score-result');
+  if (!el) return;
+  const s = sailInputs.score;
+  const g = scoreGrade(s);
+  const gc = gradeColor[g];
+  const gb = gradeBg(g);
+  const msgs = {
+    A: 'Excellent! A score of 760+ gives you access to the best rates and programs.',
+    B: `Score of 700–759 qualifies for most programs. Reaching 760+ unlocks the best rates.`,
+    C: `Score of 620–699. Many programs still available — focused effort can move this up.`,
+    D: `Score of 580–619. Limited programs available. Credit repair is recommended.`,
+    N: `Score below 580. Work with a credit counselor before applying.`,
+  };
+  // highlight correct grade cell
+  document.querySelectorAll('.score-grade-cell').forEach((cell, i) => {
+    const grades = ['A','B','C','D','N'];
+    cell.style.outline = grades[i] === g ? `3px solid ${gc}` : 'none';
+  });
+  el.innerHTML = `
+    <div style="background:var(--navy);border-radius:10px;padding:16px;color:white;display:flex;align-items:center;gap:14px">
+      <div style="width:52px;height:52px;border-radius:50%;background:${gb};color:${gc};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;flex-shrink:0;font-family:'Playfair Display',serif">${g}</div>
+      <div><strong style="font-size:15px">Grade ${g} · Score ${s}</strong><p style="font-size:12px;color:rgba(255,255,255,.65);margin-top:4px">${msgs[g]}</p></div>
+    </div>`;
+}
+
+function renderAssetResult() {
+  const el = document.getElementById('asset-result');
+  if (!el) return;
+  const { savings, homePrice } = sailInputs;
+  const downPmt  = homePrice * 0.05;
+  const closing  = homePrice * 0.035;
+  const needed   = downPmt + closing;
+  const reserves = savings - needed;
+  const g        = assetGrade(savings, homePrice);
+  const gc       = gradeColor[g];
+  const gb       = gradeBg(g);
+  const msgs = {
+    A: `${fmt(savings)} covers 20%+ down + closing costs with reserves remaining. Excellent position.`,
+    B: `${fmt(savings)} covers down payment and closing costs with some reserves. Strong position.`,
+    C: `${fmt(savings)} covers down payment and closing costs but no reserves remaining.`,
+    D: `${fmt(savings)} covers closing costs OR a down payment, but not both.`,
+    N: `${fmt(savings)} does not cover the full down payment and closing costs needed.`,
+  };
+  el.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--off-white);border-radius:8px"><span style="font-size:13px">Down Payment (5% est.)</span><strong>${fmt(downPmt)}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--off-white);border-radius:8px"><span style="font-size:13px">Closing Costs (3.5% est.)</span><strong>${fmt(closing)}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:10px 14px;background:var(--off-white);border-radius:8px;border-top:2px solid var(--light-gray)"><span style="font-size:13px;font-weight:600">Total Needed to Close</span><strong>${fmt(needed)}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:10px 14px;background:${reserves>=0?'var(--green-light)':'var(--red-light)'};border-radius:8px">
+        <span style="font-size:13px;font-weight:600;color:${reserves>=0?'var(--green)':'var(--red)'}">${reserves>=0?'Remaining as Reserves':'Shortfall'}</span>
+        <strong style="color:${reserves>=0?'var(--green)':'var(--red)'}">${fmt(Math.abs(reserves))}</strong>
+      </div>
+    </div>
+    <div style="background:var(--navy);border-radius:10px;padding:16px;color:white;display:flex;align-items:center;gap:14px">
+      <div style="width:52px;height:52px;border-radius:50%;background:${gb};color:${gc};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;flex-shrink:0;font-family:'Playfair Display',serif">${g}</div>
+      <div><strong style="font-size:15px">Grade ${g}</strong><p style="font-size:12px;color:rgba(255,255,255,.65);margin-top:4px">${msgs[g]}</p></div>
+    </div>`;
+}
+
+function renderIncomeResult() {
+  const el = document.getElementById('income-result');
+  if (!el) return;
+  const total = sailInputs.income.reduce((a,b)=>a+b,0);
+  const totalLiab = sailInputs.liabilities.reduce((a,b)=>a+b,0);
+  const dti = total > 0 ? ((totalLiab + sailInputs.housePmt) / total * 100) : 0;
+  const dtiG = dtiGrade(dti);
+  const gc = gradeColor[dtiG];
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--navy);border-radius:10px;color:white;margin-bottom:12px">
+      <strong style="font-size:14px">Total Monthly Gross Income</strong>
+      <strong style="font-size:22px;color:var(--gold)">${fmt(total)}</strong>
+    </div>
+    <div style="background:var(--off-white);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px">
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Current DTI with this income</div>
+        <div style="font-size:13px;color:var(--navy);line-height:1.5">${fmt(totalLiab + sailInputs.housePmt)} expenses ÷ ${fmt(total)} income = <strong style="color:${gc}">${dti.toFixed(1)}% DTI</strong></div>
+      </div>
+      <div style="text-align:center;flex-shrink:0">
+        <div style="width:44px;height:44px;border-radius:50%;background:${gc};color:white;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif">${dtiG}</div>
+        <div style="font-size:10px;color:var(--gray);margin-top:4px">DTI Grade</div>
+      </div>
+    </div>`;
+}
+
+function renderLiabilityResult() {
+  const el = document.getElementById('liability-result');
+  if (!el) return;
+  const totalLiab  = sailInputs.liabilities.reduce((a,b)=>a+b,0);
+  const totalIncome = sailInputs.income.reduce((a,b)=>a+b,0);
+  const housePmt   = sailInputs.housePmt;
+  const totalExp   = totalLiab + housePmt;
+  const dti        = totalIncome > 0 ? (totalExp / totalIncome * 100) : 0;
+  const g          = dtiGrade(dti);
+  const gc         = gradeColor[g];
+  const gb         = gradeBg(g);
+  const dtiGrades  = [['A','≤36%','var(--green)','var(--green-light)'],['B','37–40%','var(--blue)','var(--blue-light)'],['C','41–44%','var(--amber)','var(--amber-light)'],['D','45–50%','#e67e22','#fff0e0'],['N','51%+','var(--red)','var(--red-light)']];
+  const gradeKeys  = ['A','B','C','D','N'];
+  const msgs = {
+    A: `DTI of ${dti.toFixed(1)}% — excellent. Qualifies for the best programs and rates.`,
+    B: `DTI of ${dti.toFixed(1)}% — strong. Good program options available.`,
+    C: `DTI of ${dti.toFixed(1)}% — acceptable. Some programs available. Reducing liabilities helps.`,
+    D: `DTI of ${dti.toFixed(1)}% — high. Limited options; compensating factors needed.`,
+    N: `DTI of ${dti.toFixed(1)}% — exceeds most guidelines. Focus on reducing monthly debt.`,
+  };
+  el.innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Step 1 — Total Monthly Expenses</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+      <div style="flex:1;padding:10px 14px;background:var(--off-white);border-radius:8px"><div style="font-size:11px;color:var(--gray)">House Payment</div><div style="font-size:18px;font-weight:700;margin-top:2px">${fmt(housePmt)}</div></div>
+      <span style="font-size:20px;color:var(--gray);font-weight:300">+</span>
+      <div style="flex:1;padding:10px 14px;background:var(--off-white);border-radius:8px"><div style="font-size:11px;color:var(--gray)">Liabilities</div><div style="font-size:18px;font-weight:700;margin-top:2px">${fmt(totalLiab)}</div></div>
+      <span style="font-size:20px;color:var(--gray);font-weight:300">=</span>
+      <div style="flex:1;padding:10px 14px;background:var(--navy);border-radius:8px"><div style="font-size:11px;color:rgba(255,255,255,.6)">Total Expenses</div><div style="font-size:18px;font-weight:700;color:white;margin-top:2px">${fmt(totalExp)}</div></div>
+    </div>
+    <div style="font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Step 2 — Debt-to-Income Ratio</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+      <div style="flex:1;padding:10px 14px;background:var(--off-white);border-radius:8px"><div style="font-size:11px;color:var(--gray)">Total Expenses</div><div style="font-size:18px;font-weight:700;margin-top:2px">${fmt(totalExp)}</div></div>
+      <span style="font-size:20px;color:var(--gray);font-weight:300">÷</span>
+      <div style="flex:1;padding:10px 14px;background:var(--off-white);border-radius:8px"><div style="font-size:11px;color:var(--gray)">Gross Income</div><div style="font-size:18px;font-weight:700;margin-top:2px">${fmt(totalIncome)}</div></div>
+      <span style="font-size:20px;color:var(--gray);font-weight:300">=</span>
+      <div style="flex:1;padding:10px 14px;background:var(--navy);border-radius:8px"><div style="font-size:11px;color:rgba(255,255,255,.6)">Your DTI</div><div style="font-size:28px;font-weight:800;color:var(--gold);margin-top:2px;font-family:'Playfair Display',serif">${dti.toFixed(1)}%</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center;margin-bottom:14px">
+      ${dtiGrades.map(([gr,range,c,bg])=>`<div style="background:${bg};border-radius:8px;padding:8px 4px;${gr===g?'outline:3px solid '+c+';':''}">
+        ${gr===g?'<div style="font-size:9px;font-weight:700;color:'+c+';letter-spacing:.05em;margin-bottom:2px">YOU</div>':''}
+        <div style="font-size:20px;font-weight:800;color:${c};font-family:\'Playfair Display\',serif">${gr}</div>
+        <div style="font-size:10px;color:var(--gray);margin-top:2px">${range}</div>
+      </div>`).join('')}
+    </div>
+    <div style="background:var(--navy);border-radius:10px;padding:16px;color:white;display:flex;align-items:center;gap:14px">
+      <div style="width:52px;height:52px;border-radius:50%;background:${gb};color:${gc};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;flex-shrink:0;font-family:'Playfair Display',serif">${g}</div>
+      <div><strong style="font-size:15px">Grade ${g} · DTI ${dti.toFixed(1)}%</strong><p style="font-size:12px;color:rgba(255,255,255,.65);margin-top:4px">${msgs[g]}</p></div>
+    </div>`;
+}
+
+// ── SAIL TAB CONTENT ──
+function sailScoreContent() {
+  const s = sailInputs.score;
+  const g = scoreGrade(s);
+  const gc = gradeColor[g];
+  return `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy)">S — Credit Score</div>
+    </div>
+    <div class="info-box">Your middle credit score from all 3 bureaus is what lenders use. Check Credit Karma or Mint for a free estimate — it won't hurt your credit.</div>
+    <div class="form-group">
+      <label class="form-label">Your Estimated Credit Score</label>
+      <input class="form-input" type="number" value="${s}" style="max-width:220px" oninput="updateScore(this.value)"/>
+    </div>
+    ${clientCompWrap('reg-n','Credit Score Grading — Reviewed by Chris Basham, NMLS 1929240',
+      `<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center">
+        ${[['A','760+','var(--green)','var(--green-light)'],['B','700–759','var(--blue)','var(--blue-light)'],['C','620–699','var(--amber)','var(--amber-light)'],['D','580–619','#e67e22','#fff0e0'],['N','<580','var(--red)','var(--red-light)']].map(([gr,range,c,bg])=>`<div class="score-grade-cell" style="background:${bg};border-radius:10px;padding:12px 6px;${gr===g?'outline:3px solid '+c+';':''}"><div style="font-size:24px;font-weight:800;color:${c};font-family:'Playfair Display',serif">${gr}</div><div style="font-size:10px;color:var(--gray);margin-top:3px">${range}</div></div>`).join('')}
+      </div>`,
+      complianceItems.find(i=>i.id==='score-grades').disclaimer
+    )}
+    <div id="score-result" style="margin-top:4px"></div>`;
+}
+
+function sailAssetsContent() {
+  const { savings, homePrice } = sailInputs;
+  return `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy)">A — Assets</div>
+    </div>
+    <div class="info-box">Assets include your bank savings, retirement funds, and approved gift funds. You'll need money for your down payment, closing costs, and reserves.</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Current Savings</label><input class="form-input" type="number" value="${savings}" oninput="updateSavings(this.value)"/></div>
+      <div class="form-group"><label class="form-label">Target Home Price</label><input class="form-input" type="number" value="${homePrice}" oninput="updateHomePrice(this.value)"/></div>
+    </div>
+    ${clientCompWrap('reg-both','Funds Needed to Close — Reviewed by Chris Basham, NMLS 1929240',
+      `<div id="asset-result"></div>`,
+      complianceItems.find(i=>i.id==='closing-pct').disclaimer
+    )}`;
+}
+
+function sailIncomeContent() {
+  const inc = sailInputs.income;
+  const total = inc.reduce((a,b)=>a+b,0);
+  const sources = ['W-2 Employment','Freelance / 1099','',''];
+  return `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy)">I — Income</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;background:var(--off-white);border:1.5px solid var(--light-gray)">
+        <span style="font-size:11px;font-weight:700;color:var(--gray)">NO STANDALONE GRADE</span>
+      </div>
+    </div>
+    <div class="info-box" style="border-left-color:var(--gold);background:var(--gold-light)">
+      💡 <strong>Income doesn't receive its own grade.</strong> Instead, your gross income is used alongside your liabilities to calculate your <strong>Debt-to-Income (DTI) ratio</strong>, which is what gets graded in the <strong>L — Liabilities</strong> tab. Enter your income here accurately — it directly affects your DTI result.
+    </div>
+    <div class="info-box">Use your <strong>gross</strong> income (before taxes). Two years of steady income is typically required. Child support may be included if documented for 3+ future years. Include all applicants.</div>
+    <div style="margin-bottom:6px">
+      ${inc.map((amt,i)=>`<div class="form-row" style="margin-bottom:10px">
+        <div class="form-group" style="margin:0"><label class="form-label">Source ${i+1}</label><input class="form-input" value="${sources[i]||''}" placeholder="${i>=2?'Optional income source':''}"/></div>
+        <div class="form-group" style="margin:0"><label class="form-label">Monthly Gross Amount</label><div style="display:flex"><span style="background:var(--light-gray);border:2px solid var(--light-gray);border-right:none;padding:9px 12px;border-radius:var(--radius-sm) 0 0 var(--radius-sm);font-size:13px;color:var(--gray)">$</span><input class="form-input" type="number" value="${amt||''}" placeholder="0" oninput="updateIncome(${i},this.value)" style="border-radius:0 var(--radius-sm) var(--radius-sm) 0;border-left:none"/></div></div>
+      </div>`).join('')}
+    </div>
+    <div id="income-result"></div>
+    <div style="margin-top:16px;text-align:center">
+      <button class="btn btn-primary" onclick="switchSailTab('L')">See Your DTI Grade in L — Liabilities →</button>
+    </div>`;
+}
+
+function sailLiabilitiesContent() {
+  const liab = sailInputs.liabilities;
+  const accts = ['Car Payment — Honda Civic','Student Loan','Visa Credit Card (min)','',''];
+  return `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--navy)">L — Liabilities</div>
+    </div>
+    <div class="info-box">List monthly obligations that appear on your credit report — car payments, student loans, credit card minimums, personal loans. <strong>Not</strong> utilities, phone, cable, or groceries.</div>
+    <div style="margin-bottom:6px">
+      ${liab.map((amt,i)=>`<div class="form-row" style="margin-bottom:10px">
+        <div class="form-group" style="margin:0"><input class="form-input" value="${accts[i]||''}" placeholder="${i>=3?'Optional account':'Account name'}"/></div>
+        <div class="form-group" style="margin:0"><div style="display:flex"><span style="background:var(--light-gray);border:2px solid var(--light-gray);border-right:none;padding:9px 12px;border-radius:var(--radius-sm) 0 0 var(--radius-sm);font-size:13px;color:var(--gray)">$</span><input class="form-input" type="number" value="${amt||''}" placeholder="0" oninput="updateLiability(${i},this.value)" style="border-radius:0 var(--radius-sm) var(--radius-sm) 0;border-left:none"/></div></div>
+      </div>`).join('')}
+    </div>
+    <div style="font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Estimated Monthly House Payment</div>
+    <div style="display:flex;margin-bottom:20px"><span style="background:var(--light-gray);border:2px solid var(--light-gray);border-right:none;padding:9px 12px;border-radius:var(--radius-sm) 0 0 var(--radius-sm);font-size:13px;color:var(--gray)">$</span><input class="form-input" type="number" value="${sailInputs.housePmt}" oninput="updateHousePmt(this.value)" style="border-radius:0 var(--radius-sm) var(--radius-sm) 0;border-left:none;max-width:200px"/></div>
+    ${clientCompWrap('reg-n','DTI Calculation — Reviewed by Chris Basham, NMLS 1929240',
+      `<div id="liability-result"></div>`,
+      complianceItems.find(i=>i.id==='dti-guide').disclaimer
+    )}`;
+}
+
+function clientCompWrap(regType, title, content, disclaimer) {
+  const labels = {'reg-n':'⚖️ Regulation N (MAP Rule)','reg-z':'⚖️ Regulation Z (TILA)','reg-both':'⚖️ Regulation N + Regulation Z','reg-safe':'✅ Educational Content'};
+  return `<div class="client-comp-wrap">
+    <div class="client-comp-bar ${regType}">${labels[regType]} · ${title}</div>
+    <div class="client-comp-content">${content}</div>
+    ${disclaimer?`<div class="client-comp-disc"><span>⚖️</span><span>${disclaimer}</span></div>`:''}
+  </div>`;
+}
+
+function clientDocs() {
+  const docs = [
+    {
+      id:'dl', cat:'id', label:"Driver's License / Photo ID",
+      desc:"A current government-issued photo ID. Your lender needs to verify you are who you say you are. Make sure it isn't expired."
+    },
+    {
+      id:'ss', cat:'id', label:'Social Security Card',
+      desc:"Your SSN is used to pull your credit report and verify your identity. If you can't find your card, a letter from the SSA works too."
+    },
+    {
+      id:'w2', cat:'income', label:'W-2s — Most Recent 2 Years',
+      desc:"Your W-2 shows your total wages and taxes withheld for the year. Lenders use two years to establish consistent income history."
+    },
+    {
+      id:'stub', cat:'income', label:'Pay Stubs — Most Recent 30 Days',
+      desc:"Recent pay stubs verify your current employment and income. Most lenders need at least 30 days' worth — usually 2–3 stubs depending on your pay cycle."
+    },
+    {
+      id:'ssa', cat:'income', label:'Social Security / Disability Award Letter',
+      desc:"If you receive Social Security or disability income, your award letter confirms the amount. This income can be counted toward your qualification."
+    },
+    {
+      id:'bank', cat:'assets', label:'Bank Statements — Most Recent 2 Months',
+      desc:"All pages, even blank ones. Lenders check your balance, income deposits, and spending patterns. Large unexplained deposits may require a letter of explanation."
+    },
+    {
+      id:'ira', cat:'assets', label:'Retirement / IRA Statements (if applicable)',
+      desc:"If you're using retirement funds toward your down payment or to show reserves, your most recent statement is needed. Not required if not applicable to you."
+    },
+    {
+      id:'gift', cat:'assets', label:'Gift Letter (if receiving gift funds)',
+      desc:"If a family member is contributing to your down payment, a signed letter stating it is a gift — not a loan — is required. Your loan officer can provide the template."
+    },
+    {
+      id:'ins', cat:'property', label:"Homeowner's Insurance — Declaration Page",
+      desc:"You'll need to choose an insurance provider before closing. Your lender needs the declaration page showing coverage amounts and your policy number."
+    },
+    {
+      id:'contract', cat:'purchase', label:'Purchase Agreement / Sales Contract',
+      desc:"Once you're under contract on a home, your agent will provide this. It triggers the formal loan process — your lender needs it to begin processing your file."
+    },
+    {
+      id:'earnest', cat:'purchase', label:'Earnest Money Check (Front & Back)',
+      desc:"A copy of the check you submitted with your offer, showing both sides. This confirms your good-faith deposit and is part of your paper trail."
+    },
+  ];
+
+  const cats = {
+    id: { label:'🪪 Identification', note:'Required to verify your identity at application.' },
+    income: { label:'💼 Income', note:'Used to confirm employment history and calculate qualifying income.' },
+    assets: { label:'🏦 Assets', note:'Documents showing funds available for down payment, closing costs, and reserves.' },
+    property: { label:'🏠 Property', note:'Required once you have a home selected.' },
+    purchase: { label:'📝 Purchase Documents', note:'Provided once you are under contract — these kick off formal processing.' },
+  };
+
+  const checkedCount = Object.values(checkStates).filter(Boolean).length;
+  const totalCount = docs.length;
+  const pct = Math.round(checkedCount / totalCount * 100);
+
+  let html = `
+    <div class="page-header">
+      <h1>📁 Document Checklist</h1>
+      <p>Use this list to prepare and track which documents you've gathered. Your advisor will let you know exactly when and how to submit them.</p>
+    </div>
+
+    <!-- EXPECTATIONS BUTTON + PROGRESS -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="background:white;border-radius:var(--radius);padding:14px 20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px">
+          <div class="progress-bar" style="width:120px;height:8px"><div class="progress-fill" style="width:${pct}%"></div></div>
+          <span style="font-size:13px;font-weight:600;color:var(--navy)">${checkedCount} of ${totalCount} ready</span>
+        </div>
+      </div>
+      <div style="position:relative;display:inline-block" id="expectations-wrap">
+        <button
+          class="btn btn-gold"
+          style="gap:8px;box-shadow:0 4px 14px rgba(240,165,0,0.35);font-size:16px;padding:12px 24px"
+          onmouseenter="document.getElementById('expectations-tip').style.display='block'"
+          onmouseleave="document.getElementById('expectations-tip').style.display='none'"
+          onclick="document.getElementById('expectations-tip').style.display=document.getElementById('expectations-tip').style.display==='block'?'none':'block'"
+        >
+          💬 Setting Expectations
+        </button>
+        <div id="expectations-tip" style="
+          display:none;
+          position:absolute;
+          right:0;
+          top:calc(100% + 10px);
+          width:320px;
+          background:var(--navy);
+          color:white;
+          border-radius:12px;
+          padding:18px 20px;
+          font-size:13px;
+          line-height:1.7;
+          box-shadow:var(--shadow-lg);
+          z-index:20;
+        ">
+          <div style="font-weight:700;font-size:14px;margin-bottom:8px;color:var(--gold)">A note before you begin 🦆</div>
+          <p style="margin:0;color:rgba(255,255,255,.85)">During the mortgage process you'll receive a lot of document requests — and occasionally it may feel repetitive or like you've already provided something. That's completely normal. Your loan team is building the strongest possible case on your behalf to secure you a significant amount of money. The more promptly you provide what's asked, the smoother and faster the path to your keys. You've got this!</p>
+          <div style="position:absolute;top:-6px;right:20px;width:12px;height:12px;background:var(--navy);transform:rotate(45deg);border-radius:2px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="callout callout-info" style="margin-bottom:20px">
+      ℹ️ <span><strong>Document Storage Notice:</strong> This checklist is a preparation tool only. Documents are <strong>not uploaded or stored</strong> here. When the time comes, your loan officer will instruct you on the secure method for submitting your documents directly to them.</span>
+    </div>`;
+
+  for (const [cat, catInfo] of Object.entries(cats)) {
+    const items = docs.filter(d => d.cat === cat);
+    if (!items.length) continue;
+    const catChecked = items.filter(i => checkStates[i.id]).length;
+    html += `
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-header">
+          <h2>${catInfo.label}</h2>
+          <span style="font-size:12px;color:var(--gray)">${catChecked}/${items.length} ready</span>
+        </div>
+        <div style="padding:8px 16px 4px;font-size:12px;color:var(--gray);border-bottom:1px solid var(--light-gray)">${catInfo.note}</div>
+        <div class="card-body" style="padding:8px 12px">`;
+
+    items.forEach(item => {
+      const checked = !!checkStates[item.id];
+      html += `
+        <div class="check-item ${checked?'checked':''}" id="ci-${item.id}" onclick="toggleCheck('${item.id}')">
+          <div class="check-box" style="flex-shrink:0">${checked?'✓':''}</div>
+          <div style="flex:1;min-width:0">
+            <div class="check-label" style="font-weight:600">${item.label}</div>
+            <div style="font-size:12px;color:${checked?'var(--green)':'var(--gray)'};margin-top:3px;line-height:1.5">${item.desc}</div>
+          </div>
+        </div>`;
+    });
+
+    html += `</div></div>`;
+  }
+
+  return html;
+}
+
+function toggleCheck(id) {
+  checkStates[id] = !checkStates[id];
+  // re-render the docs page to update the progress counter
+  client('docs');
+}
+
+function clientMilestones() {
+  return `<div class="page-header"><h1>🎯 Milestones</h1><p>Your personalized roadmap to homeownership.</p></div>
+    <div class="card"><div class="card-body"><div class="milestone-track">
+      <div class="milestone-item done"><div class="m-dot"></div><h4>Complete S.A.I.L. Self-Assessment</h4><p>Completed March 5, 2026</p></div>
+      <div class="milestone-item done"><div class="m-dot"></div><h4>Submit Initial Documents</h4><p>Completed March 8, 2026</p></div>
+      <div class="milestone-item now"><div class="m-dot"></div><h4>Improve Credit Score to 700+</h4><p>Target: May 2026 · Current: 682</p></div>
+      <div class="milestone-item"><div class="m-dot"></div><h4>Reduce DTI to Under 40%</h4><p>Target: Jun 2026</p></div>
+      <div class="milestone-item"><div class="m-dot"></div><h4>Get Pre-Qualified with Chris</h4><p>Target: Jun 2026</p></div>
+      <div class="milestone-item"><div class="m-dot"></div><h4>Start House Shopping in Nashville</h4><p>Target: Jul 2026</p></div>
+      <div class="milestone-item"><div class="m-dot"></div><h4>Close on Your New Home 🎉</h4><p>Target: Sep–Oct 2026</p></div>
+    </div></div></div>`;
+}
+
+function clientAdvisor() {
+  return `<div class="page-header"><h1>Your Advisor</h1></div>
+    <div class="card"><div class="card-body" style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+      <div style="width:80px;height:80px;border-radius:50%;background:var(--navy);color:var(--gold);font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center">CB</div>
+      <div style="flex:1">
+        <h2 style="font-family:'Playfair Display',serif;font-size:22px">Chris Basham</h2>
+        <p style="color:var(--gray);font-size:14px;margin-top:4px">Loan Originator · Premier Mortgage Group · NMLS 1929240</p>
+        <p style="font-size:13px;color:var(--navy);margin-top:12px;line-height:1.6;max-width:500px">After 5 years in the US Coast Guard and a 23-year career in telecom, Chris now helps Middle Tennessee families get the financing they need to purchase their home.</p>
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+          <a href="tel:6159940112" class="btn btn-primary btn-sm">📞 615-994-0112</a>
+          <a href="https://www.chrisbashammortgage.com" target="_blank" class="btn btn-outline btn-sm">🌐 chrisbashammortgage.com</a>
+        </div>
+      </div>
+    </div></div>
+    <div class="card"><div class="card-header"><h2>Send a Message</h2></div><div class="card-body">
+      <div class="form-group"><label class="form-label">Subject</label><input class="form-input" placeholder="e.g. Question about my DTI ratio"/></div>
+      <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" rows="4" placeholder="Type your message here..."></textarea></div>
+      <button class="btn btn-primary">Send Message</button>
+    </div></div>`;
+}
+
+// ════════════════════════════════════════
+// COMPLIANCE EDIT MODAL
+// ════════════════════════════════════════
+function openEdit(id) {
+  currentEditItem = complianceItems.find(i=>i.id===id);
+  if (!currentEditItem) return;
+  document.getElementById('modal-title').textContent = currentEditItem.title;
+  document.getElementById('modal-badges').innerHTML =
+    currentEditItem.regs.map(r=>`<span class="comp-badge ${r}">${r==='reg-n'?'Reg N — MAP Rule':'Reg Z — TILA'}</span>`).join('') +
+    `<span class="risk-ind risk-${currentEditItem.risk}">${currentEditItem.risk.charAt(0).toUpperCase()+currentEditItem.risk.slice(1)} Risk</span>`;
+  const callouts = {high:`<div class="callout callout-both">🚨 <span><strong>High Risk:</strong> Subject to both Reg N and Reg Z. Violations can result in civil penalties up to $16,000 per day.</span></div>`,
+    medium:`<div class="callout callout-n">⚠️ <span><strong>Medium Risk:</strong> Subject to Regulation N. Ensure content accurately reflects your actual programs.</span></div>`,
+    low:`<div class="callout callout-info">✅ <span><strong>Low Risk:</strong> Educational content. No disclaimer required, but changes should still be logged.</span></div>`};
+  document.getElementById('modal-callout').innerHTML = callouts[currentEditItem.risk];
+  document.getElementById('modal-reg-context').textContent = currentEditItem.regContext;
+  document.getElementById('modal-field-lbl').textContent = currentEditItem.title;
+  document.getElementById('modal-field-input').value = currentEditItem.currentValue;
+  document.getElementById('modal-disc-input').value = currentEditItem.disclaimer;
+  document.getElementById('modal-disc-preview').textContent = currentEditItem.disclaimer || 'No disclaimer — educational content only.';
+  openModal('edit-modal');
+}
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'modal-disc-input') {
+    const p = document.getElementById('modal-disc-preview');
+    if (p) p.textContent = e.target.value || 'No disclaimer text entered.';
+  }
+});
+
+function saveEdit() {
+  if (!currentEditItem) return;
+  currentEditItem.currentValue = document.getElementById('modal-field-input').value;
+  currentEditItem.disclaimer = document.getElementById('modal-disc-input').value;
+  currentEditItem.status = 'approved';
+  currentEditItem.lastReviewed = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  auditLog.unshift({ts:new Date().toISOString().slice(0,16).replace('T',' '),user:'Chris B.',action:`Approved: ${currentEditItem.title} — content updated and disclaimer reviewed`,status:'approved'});
+  closeModal('edit-modal');
+  const active = document.querySelector('#pro-sb .sidebar-item.active');
+  if (active) active.click();
+}
+
+// #14 — Flag item for review
+function flagItem(id) {
+  const item = complianceItems.find(i=>i.id===id);
+  if (item) {
+    item.status = 'needs-review';
+    auditLog.unshift({ts:new Date().toISOString().slice(0,16).replace('T',' '),user:'Chris B.',action:`Flagged for review: ${item.title}`,status:'flagged'});
+  }
+  closeModal('edit-modal');
+  const active = document.querySelector('#pro-sb .sidebar-item.active');
+  if (active) active.click();
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+goTo('login');
+</script>
+</body>
+</html>
